@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Auth - Realtime Chat App",
+  title: "Auth - CoongChat App",
   description: "Đăng nhập hoặc đăng ký để sử dụng ứng dụng chat thời gian thực",
 };
 
