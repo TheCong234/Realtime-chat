@@ -1,5 +1,6 @@
 import Image from "next/image";
 import "../../globals.css";
+import Link from "next/link";
 
 const RegisterPage = () => {
   return (
@@ -15,17 +16,18 @@ const RegisterPage = () => {
               width={20}
               height={20}
             />
-            <span className="ml-2 text-xl font-bold text-gray-700">
+            <span className="ml-2 text-2xl font-bold text-gray-700">
               CoongChat
             </span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 ">
             <svg
               viewBox="0 0 24 24"
-              width="18"
-              height="18"
+              width="20"
+              height="20"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
+              className="mt-1"
             >
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
               <g
@@ -43,7 +45,69 @@ const RegisterPage = () => {
               </g>
             </svg>
             <div>
-              <h3 className="text-lg font-bold">Get started quickly</h3>
+              <h3 className="text-xl font-bold">Get started quickly</h3>
+              <p className="text-secondary">
+                Integrate with developer-friendly APIs or choose low-code.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 mt-8">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="mt-1"
+            >
+              <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M1.5 12C1.5 6.20101 6.20101 1.5 12 1.5C17.799 1.5 22.5 6.20101 22.5 12C22.5 17.799 17.799 22.5 12 22.5C6.20101 22.5 1.5 17.799 1.5 12ZM15.7127 10.7197C16.0055 10.4268 16.0055 9.95192 15.7127 9.65903C15.4198 9.36614 14.9449 9.36614 14.652 9.65903L10.9397 13.3713L9.34869 11.7804C9.0558 11.4875 8.58092 11.4875 8.28803 11.7804C7.99514 12.0732 7.99514 12.5481 8.28803 12.841L10.4093 14.9623C10.7022 15.2552 11.1771 15.2552 11.47 14.9623L15.7127 10.7197Z"
+                  fill="#3A52EE"
+                ></path>
+              </g>
+            </svg>
+            <div>
+              <h3 className="text-xl font-bold">Get started quickly</h3>
+              <p className="text-secondary">
+                Integrate with developer-friendly APIs or choose low-code.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2 mt-8">
+            <svg
+              viewBox="0 0 24 24"
+              width="20"
+              height="20"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              className="mt-1"
+            >
+              <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+              <g
+                id="SVGRepo_tracerCarrier"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              ></g>
+              <g id="SVGRepo_iconCarrier">
+                <path
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                  d="M1.5 12C1.5 6.20101 6.20101 1.5 12 1.5C17.799 1.5 22.5 6.20101 22.5 12C22.5 17.799 17.799 22.5 12 22.5C6.20101 22.5 1.5 17.799 1.5 12ZM15.7127 10.7197C16.0055 10.4268 16.0055 9.95192 15.7127 9.65903C15.4198 9.36614 14.9449 9.36614 14.652 9.65903L10.9397 13.3713L9.34869 11.7804C9.0558 11.4875 8.58092 11.4875 8.28803 11.7804C7.99514 12.0732 7.99514 12.5481 8.28803 12.841L10.4093 14.9623C10.7022 15.2552 11.1771 15.2552 11.47 14.9623L15.7127 10.7197Z"
+                  fill="#3A52EE"
+                ></path>
+              </g>
+            </svg>
+            <div>
+              <h3 className="text-xl font-bold">Get started quickly</h3>
               <p className="text-secondary">
                 Integrate with developer-friendly APIs or choose low-code.
               </p>
@@ -53,16 +117,30 @@ const RegisterPage = () => {
 
         {/*Right: Form */}
         <div className="p-8 bg-white rounded-xl shadow-md">
-          <h1 className="text-2xl font-bold mb-2">Chào mừng quay trở lại</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            Đăng ký 1 tài khoản để lưu giữ các câu chuyện của bạn
+          </h1>
           <p className="text-gray-500 mb-6">
-            Bắt đầu chat trong thoáng chốc. Bạn không có tài khoản?
-            <a href="#" className="text-blue-600 font-medium">
-              Đăng ký.
-            </a>
+            Bắt đầu chat trong thoáng chốc. Bạn đã có tài khoản?
+            <Link href="/login" className="text-blue-600 font-medium">
+              Đăng nhập.
+            </Link>
           </p>
-          <div className="flex gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-2">
+            {/*Fullname */}
+            <div className="">
+              <label className="block text-sm font-medium text-gray-700 mb-2 ">
+                Tên đầy đủ
+              </label>
+              <input
+                type="text"
+                placeholder="Nguyễn Văn A"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+
             {/*Email */}
-            <div className="mb-4 w-full">
+            <div className="">
               <label className="block text-sm font-medium text-gray-700 mb-2 ">
                 Email
               </label>
@@ -74,9 +152,21 @@ const RegisterPage = () => {
             </div>
 
             {/*Password */}
-            <div className="mb-4 w-full">
+            <div className="">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Mật khẩu
+              </label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+              />
+            </div>
+
+            {/*confirm Password */}
+            <div className="">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Nhập lại Mật khẩu
               </label>
               <input
                 type="password"
@@ -87,7 +177,7 @@ const RegisterPage = () => {
           </div>
 
           {/*Remember + Forgot */}
-          <div className="flex items-center justify-between mb-2">
+          <div className="  mb-2">
             <label className="flex items-center text-sm text-gray-600">
               <input
                 type="checkbox"
@@ -95,9 +185,6 @@ const RegisterPage = () => {
               />
               Remember me
             </label>
-            <a href="#" className="text-sm text-blue-600 hover:underline">
-              Quên mật khẩu?
-            </a>
           </div>
 
           {/*Submit */}
