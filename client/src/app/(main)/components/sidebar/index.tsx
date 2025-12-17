@@ -1,10 +1,6 @@
+"use client";
 import * as React from "react";
-import {
-  EllipsisIcon,
-  GalleryVerticalEnd,
-  SearchIcon,
-  SquarePenIcon,
-} from "lucide-react";
+import { EllipsisIcon, GalleryVerticalEnd, SearchIcon, SquarePenIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -15,12 +11,16 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Button } from "./ui/button";
-import StatusDot from "./StatusDot";
-import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
-import { Input } from "./ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
-import { ChatCard } from "./ChatCard";
+import { Button } from "@/components/ui/button";
+import StatusDot from "@/components/StatusDot";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ChatCard } from "@/app/(main)/components/ChatCard";
+import Link from "next/link";
+import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { OptionDropdown } from "./OptionDropdown";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -31,30 +31,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuItem>
               <div className="flex">
                 <SidebarMenuButton size="lg" asChild>
-                  <a href="#">
+                  <Link href="/">
                     <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                       <GalleryVerticalEnd className="size-4" />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-medium">Trần Thế Công</span>
-                      <div className="flex gap-1 items-center">
+                      <span className="font-medium">Người dùng hiện tại</span>
+                      <div className="flex items-center gap-1">
                         <StatusDot />
                         <span className="text-xs">Online</span>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 </SidebarMenuButton>
                 <div className="flex gap-3">
                   <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="size-8 bg-gray-300 rounded-full hover:bg-gray-400 cursor-pointer"
-                      >
-                        <EllipsisIcon />
-                      </Button>
-                    </TooltipTrigger>
+                    <DropdownMenu>
+                      <TooltipTrigger asChild>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            variant="secondary"
+                            size="icon"
+                            className="size-8 rounded-full bg-gray-300 hover:bg-gray-400"
+                          >
+                            <EllipsisIcon />
+                          </Button>
+                        </DropdownMenuTrigger>
+                      </TooltipTrigger>
+
+                      <OptionDropdown />
+                    </DropdownMenu>
+
                     <TooltipContent>
                       <p>Cài đặt, trợ giúp, v.v...</p>
                     </TooltipContent>
@@ -63,13 +70,17 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Button
+                        asChild
                         variant="secondary"
                         size="icon"
-                        className="size-8 bg-gray-300 rounded-full hover:bg-gray-400 cursor-pointer"
+                        className="size-8 cursor-pointer rounded-full bg-gray-300 hover:bg-gray-400"
                       >
-                        <SquarePenIcon />
+                        <Link href="/new-chat">
+                          <SquarePenIcon />
+                        </Link>
                       </Button>
                     </TooltipTrigger>
+
                     <TooltipContent>
                       <p>Tin nhắn mới</p>
                     </TooltipContent>
@@ -81,18 +92,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {/* search */}
             <SidebarMenuItem className="mt-3">
               <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input
-                  type="search"
-                  placeholder="Search..."
-                  className="flex-1"
-                />
+                <Input type="search" placeholder="Search..." className="flex-1" />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       type="submit"
                       variant="secondary"
                       size="icon"
-                      className=" bg-gray-300 hover:bg-gray-400 cursor-pointer"
+                      className="cursor-pointer bg-gray-300 hover:bg-gray-400"
                     >
                       <SearchIcon className="h-4 w-4" />
                     </Button>
@@ -119,7 +126,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <TabsContent value="account">
             {[...Array(3)].map((_, index) => (
               <div key={index}>
-                <ChatCard name="Bich Lien" message="hello fen" />
+                <ChatCard name="Bich Lien" message="hello fen" messageId={index + 1 + ""} />
               </div>
             ))}
           </TabsContent>

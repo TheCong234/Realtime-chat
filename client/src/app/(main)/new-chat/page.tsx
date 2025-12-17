@@ -1,7 +1,7 @@
+import { Input } from "@/components/ui/input";
+import Footer from "../components/Footer";
 import { ChatMessageData } from "@/types/chat";
-import Footer from "../../components/Footer";
-import Toolbar from "../../components/Toolbar";
-import { ChatMessage } from "./ChatMessage";
+import { ChatMessage } from "../messenger/[id]/ChatMessage";
 
 const messages: ChatMessageData[] = [
   {
@@ -76,10 +76,18 @@ const messages: ChatMessageData[] = [
   },
 ];
 
-const ChatPage = () => {
+const NewChatPage = () => {
   return (
-    <div className="flex h-full flex-col justify-between rounded-xl bg-white shadow-xl">
-      <Toolbar name="Trần Thế Công" avatar="/assets/images/no-avatar.png" status="Hoạt động 2 phút trước" />
+    <div className="flex h-full w-full flex-col justify-between rounded-2xl bg-white">
+      <div className="border-border flex items-center gap-2 border-b p-3">
+        <label htmlFor="send-to">Đến:</label>
+        <Input
+          id="send-to"
+          placeholder="Nhập tên người nhận"
+          type="text"
+          className="border-none shadow-none outline-none focus:border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+        />
+      </div>
       <div className="h-full overflow-auto p-3">
         <div className="flex flex-col gap-2">
           {messages.map((msg) => (
@@ -87,10 +95,9 @@ const ChatPage = () => {
           ))}
         </div>
       </div>
-
       <Footer />
     </div>
   );
 };
 
-export default ChatPage;
+export default NewChatPage;
