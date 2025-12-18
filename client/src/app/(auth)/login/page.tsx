@@ -1,4 +1,6 @@
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Link from "next/link";
 
 const LoginPage = () => {
   return (
@@ -22,9 +24,9 @@ const LoginPage = () => {
           <h1 className="text-2xl font-bold mb-2">Chào mừng quay trở lại</h1>
           <p className="text-gray-500 mb-6">
             Bắt đầu chat trong thoáng chốc. Bạn không có tài khoản?
-            <a href="#" className="text-blue-600 font-medium">
+            <Link href="/register" className="text-blue-600 font-medium">
               Đăng ký.
-            </a>
+            </Link>
           </p>
           <div className="flex gap-6">
             {/*Email */}
@@ -61,15 +63,18 @@ const LoginPage = () => {
               />
               Remember me
             </label>
-            <a href="#" className="text-sm text-blue-600 hover:underline">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
               Quên mật khẩu?
-            </a>
+            </Link>
           </div>
 
           {/*Submit */}
-          <button className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium">
+          <Button className="w-full" variant={"default"}>
             Đăng nhập
-          </button>
+          </Button>
 
           {/*Divider */}
           <div className="flex items-center my-4">

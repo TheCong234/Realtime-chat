@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="CoongChat.API/CoongChat.API.csproj" />
+  <Project Path="CoongChat.Application/CoongChat.Application.csproj" />
+  <Project Path="CoongChat.Domain/CoongChat.Domain.csproj" />
+  <Project Path="CoongChat.Infrastructure/CoongChat.Infrastructure.csproj" />
+</Solution>
