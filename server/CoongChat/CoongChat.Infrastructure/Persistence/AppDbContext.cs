@@ -20,6 +20,7 @@ namespace CoongChat.Infrastructure.Persistence
 
         #region DbSets  
         public DbSet<User> Users => Set<User>();
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         #endregion
 

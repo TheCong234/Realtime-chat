@@ -1,0 +1,36 @@
+# Tệp EditorConfig giúp định nghĩa quy tắc format code
+# Đặt file này ở root của solution
+root = true
+
+# Áp dụng cho tất cả file C#
+[*.cs]
+
+# Encoding và thụt lề
+charset = utf-8
+indent_style = space
+indent_size = 4
+
+# Quy tắc về dấu ngoặc và khoảng trắng
+csharp_new_line_before_open_brace = all
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_between_method_declaration_parameter_list_parentheses = false
+csharp_space_between_method_call_parameter_list_parentheses = false
+
+# Quy tắc đặt tên
+dotnet_naming_rule.private_fields_should_be_camel_case.severity = suggestion
+dotnet_naming_rule.private_fields_should_be_camel_case.symbols = private_fields
+dotnet_naming_rule.private_fields_should_be_camel_case.style = camel_case_style
+
+dotnet_naming_symbols.private_fields.applicable_kinds = field
+dotnet_naming_symbols.private_fields.applicable_accessibilities = private
+dotnet_naming_symbols.private_fields.required_modifiers = 
+
+dotnet_naming_style.camel_case_style.capitalization = camel_case
+
+# Quy tắc về using
+dotnet_sort_system_directives_first = true
+
+# Quy tắc về var
+csharp_style_var_for_built_in_types = true:suggestion
+csharp_style_var_when_type_is_apparent = true:suggestion
+csharp_style_var_elsewhere = false:suggestion
