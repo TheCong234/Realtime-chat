@@ -1,8 +1,9 @@
-﻿using CoongChat.Application.Interfaces;
-using CoongChat.Domain.Entities;
-using MediatR;
 using System.Security.Cryptography;
 using System.Text;
+using CoongChat.Application.Features.Users.Commands.CreateUser;
+using CoongChat.Application.Interfaces;
+using CoongChat.Domain.Entities;
+using MediatR;
 
 public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, Guid>
 {

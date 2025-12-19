@@ -18,5 +18,7 @@ namespace CoongChat.Domain.Entities
         public DateTime? LastActiveAt { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        public string Role { get; set; } = "User";
     }
 }

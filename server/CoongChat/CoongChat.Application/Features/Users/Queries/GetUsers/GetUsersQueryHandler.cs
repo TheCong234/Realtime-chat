@@ -1,5 +1,6 @@
-﻿using AutoMapper;
+using AutoMapper;
 using CoongChat.Application.Features.Users.DTOs;
+using CoongChat.Application.Features.Users.Queries.GetUsers;
 using CoongChat.Application.Interfaces;
 using MediatR;
 

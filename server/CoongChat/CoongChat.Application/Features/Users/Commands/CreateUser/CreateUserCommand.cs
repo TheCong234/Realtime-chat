@@ -1,8 +1,11 @@
-﻿using MediatR;
+using MediatR;
 
-public record CreateUserCommand(
+namespace CoongChat.Application.Features.Users.Commands.CreateUser
+{
+    public record CreateUserCommand(
     string Username,
     string Email,
     string Password,
     string? AvatarUrl
 ) : IRequest<Guid>;
+}

@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+using CoongChat.Application.Features.Users.Commands.CreateUser;
+using FluentValidation;
 
 public class CreateUserCommandValidator
     : AbstractValidator<CreateUserCommand>

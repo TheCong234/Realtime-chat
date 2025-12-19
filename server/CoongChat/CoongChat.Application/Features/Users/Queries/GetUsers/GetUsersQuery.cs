@@ -1,4 +1,7 @@
-﻿using CoongChat.Application.Features.Users.DTOs;
+using CoongChat.Application.Features.Users.DTOs;
 using MediatR;
 
-public record GetUsersQuery() : IRequest<List<UserDto>>;
+namespace CoongChat.Application.Features.Users.Queries.GetUsers
+{
+    public record GetUsersQuery() : IRequest<List<UserDto>>;
+}
