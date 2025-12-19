@@ -1,4 +1,5 @@
 
+using CoongChat.Application.Common.Exceptions;
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Auth.Commands;
 using CoongChat.Application.Features.Auth.DTOs;
@@ -29,10 +30,10 @@ namespace CoongChat.Application.Features.Auth.Handlers
             CancellationToken ct)
         {
             var user = await _repo.GetByUsernameOrEmailAsync(request.UsernameOrEmail)
-                ?? throw new Exception("Invalid credentials");
+                ?? throw new UnauthorizedException("Không tìm thấy thông tin tài khoản");
 
             if (!_hasher.Verify(request.Password, user.PasswordHash))
-                throw new Exception("Invalid credentials");
+                throw new UnauthorizedException("Mật khẩu không hợp lệ");
 
             var accessToken = _jwt.GenerateAccessToken(user);
             var refreshToken = _jwt.GenerateRefreshToken(user);

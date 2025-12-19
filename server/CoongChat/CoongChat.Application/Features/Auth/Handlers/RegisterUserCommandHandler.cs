@@ -1,3 +1,4 @@
+using CoongChat.Application.Common.Exceptions;
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Auth.Commands;
 using CoongChat.Application.Features.Auth.DTOs;
@@ -27,7 +28,7 @@ public class RegisterUserCommandHandler
         CancellationToken ct)
     {
         if (await _repo.ExistsAsync(request.Username, request.Email))
-            throw new Exception("User already exists");
+            throw new UnauthorizedException("Tên người dùng hoạc Email đã tồn tại");
 
         var user = new User
         {

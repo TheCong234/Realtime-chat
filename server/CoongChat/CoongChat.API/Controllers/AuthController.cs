@@ -1,3 +1,4 @@
+using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Auth.Commands;
 using CoongChat.Application.Features.Auth.DTOs;
 using MediatR;
@@ -18,10 +19,10 @@ namespace CoongChat.API.Controllers
 
         [HttpPost("register")]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(
+        public async Task<ActionResult<BaseResponse<AuthDto>>> Register(
             [FromBody] RegisterRequest request)
         {
-            var userId = await _mediator.Send(
+            var result = await _mediator.Send(
                 new RegisterUserCommand(
                     request.Username,
                     request.Email,
@@ -29,16 +30,12 @@ namespace CoongChat.API.Controllers
                 )
             );
 
-            return CreatedAtAction(
-                nameof(Register),
-                new { id = userId },
-                new { userId }
-            );
+            return Ok(result);
         }
 
         [HttpPost("login")]
         [AllowAnonymous]
-        public async Task<ActionResult<AuthResponse>> Login(
+        public async Task<ActionResult<BaseResponse<AuthDto>>> Login(
             [FromBody] LoginRequest request)
         {
             var result = await _mediator.Send(
