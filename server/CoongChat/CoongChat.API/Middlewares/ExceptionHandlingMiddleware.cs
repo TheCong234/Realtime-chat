@@ -1,7 +1,5 @@
 using System.Net;
-using System.Text.Json;
 using CoongChat.Application.Common.Exceptions;
-using CoongChat.Application.Common.Models;
 
 namespace CoongChat.API.Middlewares
 {
@@ -23,7 +21,11 @@ namespace CoongChat.API.Middlewares
             catch (UnauthorizedException ex)
             {
                 context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                await WriteResponse(context, ex.Message);
+                await context.Response.WriteAsJsonAsync(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
             }
             catch (ValidationExceptionCustom ex)
             {
@@ -46,17 +48,6 @@ namespace CoongChat.API.Middlewares
                     message = ex.Message
                 });
             }
-        }
-
-        private static async Task WriteResponse(
-            HttpContext context,
-            string message)
-        {
-            context.Response.ContentType = "application/json";
-
-            var response = BaseResponse.Fail(message);
-            await context.Response.WriteAsync(
-                JsonSerializer.Serialize(response));
         }
     }
 }

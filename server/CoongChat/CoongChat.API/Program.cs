@@ -26,34 +26,46 @@ namespace CoongChat.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
-            builder.Services
-    .AddControllers()
-    .ConfigureApiBehaviorOptions(options =>
-    {
-        options.InvalidModelStateResponseFactory = context =>
-        {
-            var errors = context.ModelState
-                .Where(x => x.Value?.Errors.Count > 0)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value!.Errors
-                        .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
-                            ? "Giá trị không hợp lệ"
-                            : e.ErrorMessage)
-                        .ToArray()
-                );
-
-            var response = new
+            builder.Services.AddCors(options =>
             {
-                success = false,
-                message = "Dữ liệu không hợp lệ",
-                errors
-            };
+                options.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy
+                        .WithOrigins(
+                            "http://localhost:3000"
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials();
+                });
+            });
 
-            return new BadRequestObjectResult(response);
-        };
-    });
+            builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
+            {
+                options.InvalidModelStateResponseFactory = context =>
+                {
+                    var errors = context.ModelState
+                        .Where(x => x.Value?.Errors.Count > 0)
+                        .ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => kvp.Value!.Errors
+                                .Select(e => string.IsNullOrWhiteSpace(e.ErrorMessage)
+                                    ? "Giá trị không hợp lệ"
+                                    : e.ErrorMessage)
+                                .ToArray()
+                        );
+
+                    var response = new
+                    {
+                        success = false,
+                        message = "Dữ liệu không hợp lệ ee",
+                        errors
+                    };
+
+                    return new BadRequestObjectResult(response);
+                };
+            });
+
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             //JWT Authentication
@@ -139,6 +151,7 @@ namespace CoongChat.API
             }
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
+            app.UseCors("CorsPolicy");
             app.UseAuthorization();
             app.UseAuthentication();
 
