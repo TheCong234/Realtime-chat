@@ -33,7 +33,7 @@ namespace CoongChat.Application.Features.Auth.Handlers
                 ?? throw new UnauthorizedException("Không tìm thấy thông tin tài khoản");
 
             if (!_hasher.Verify(request.Password, user.PasswordHash))
-                throw new UnauthorizedException("Mật khẩu không hợp lệ");
+                throw new UnauthorizedException("Mật khẩu không đúng");
 
             var accessToken = _jwt.GenerateAccessToken(user);
             var refreshToken = _jwt.GenerateRefreshToken(user);

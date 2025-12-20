@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("api/users")]
+[Route("api/v1/[controller]")]
 public class UsersController : ControllerBase
 {
     private readonly IMediator _mediator;
