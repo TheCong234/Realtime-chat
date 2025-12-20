@@ -1,7 +1,5 @@
-import { AppSidebar } from "@/app/(main)/components/sidebar";
-import AuthGuard from "@/components/AuthGuard";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import type { Metadata } from "next";
+import LayoutClient from "./LayoutClient";
 
 export const metadata: Metadata = {
   title: "CoongChat App",
@@ -13,17 +11,5 @@ export default function MainLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div>
-      <SidebarProvider>
-        <AppSidebar />
-        <SidebarInset className="flex h-screen max-h-screen flex-col">
-          {/* chat content */}
-          <div className="flex-1 overflow-y-scroll bg-[#F0F2F5] p-4">
-            <AuthGuard>{children}</AuthGuard>
-          </div>
-        </SidebarInset>
-      </SidebarProvider>
-    </div>
-  );
+  return <LayoutClient>{children}</LayoutClient>;
 }

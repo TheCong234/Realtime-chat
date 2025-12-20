@@ -1,21 +1,14 @@
-import { Maybe } from "yup";
-
-export interface User {
-  id: number;
-  email: string;
-}
-
-export interface AuthResponse {
+export interface IAuthResponse {
   accessToken: string;
   refreshToken: string;
 }
 
-export interface LoginPayload {
+export interface ILoginPayload {
   usernameOrEmail: string;
   password: string;
 }
 
-export interface RegisterPayload {
+export interface IRegisterPayload {
   username: string;
   fullName: string;
   email: string;

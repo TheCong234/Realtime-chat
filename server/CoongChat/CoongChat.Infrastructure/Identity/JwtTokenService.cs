@@ -33,7 +33,7 @@ namespace CoongChat.Infrastructure.Identity
             new Claim(ClaimTypes.Email, user.Email),
 
             // Role-based (READY)
-            new Claim(ClaimTypes.Role, user.Role ?? "User")
+            new Claim(ClaimTypes.Role, user.Role)
         };
 
             var key = new SymmetricSecurityKey(

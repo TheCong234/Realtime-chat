@@ -3,6 +3,7 @@ using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Auth.Commands;
 using CoongChat.Application.Features.Auth.DTOs;
 using CoongChat.Application.Interfaces;
+using CoongChat.Domain.Common;
 using CoongChat.Domain.Entities;
 using MediatR;
 
@@ -33,12 +34,15 @@ public class RegisterUserCommandHandler
         var user = new User
         {
             Id = Guid.NewGuid(),
+            FullName = request.FullName,
             Username = request.Username,
             Email = request.Email,
             PasswordHash = _hasher.Hash(request.Password),
             CreatedAt = DateTime.UtcNow,
-            IsActive = true,
-            Role = "User"
+            AvatarUrl = null,
+            Status = UserStatus.Offline,
+            PhoneNumber = request.PhoneNumber,
+
         };
         await _repo.AddAsync(user);
         var data = new AuthDto

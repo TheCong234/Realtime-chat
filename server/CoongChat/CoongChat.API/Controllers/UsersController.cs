@@ -1,6 +1,4 @@
 
-using CoongChat.Application.Features.Users.Commands.CreateUser;
-using CoongChat.Application.Features.Users.Queries.GetUsers;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,14 +13,4 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-        => Ok(await _mediator.Send(new GetUsersQuery()));
-
-    [HttpPost]
-    public async Task<IActionResult> Create(CreateUserCommand command)
-    {
-        var id = await _mediator.Send(command);
-        return CreatedAtAction(nameof(GetAll), new { id }, id);
-    }
 }

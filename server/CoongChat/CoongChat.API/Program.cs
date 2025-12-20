@@ -4,7 +4,6 @@ using CoongChat.API.Middlewares;
 using CoongChat.Application.Common.Behaviors;
 using CoongChat.Application.Features.Auth.Commands;
 using CoongChat.Application.Features.Auth.Validators;
-using CoongChat.Application.Features.Users.Commands.CreateUser;
 using CoongChat.Application.Interfaces;
 using CoongChat.Infrastructure.Identity;
 using CoongChat.Infrastructure.Persistence;
@@ -12,6 +11,7 @@ using CoongChat.Infrastructure.Repositories;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -69,20 +69,25 @@ namespace CoongChat.API
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             //JWT Authentication
-            builder.Services.AddAuthentication("Bearer")
-                .AddJwtBearer(options =>
+            builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    options.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = true,
-                        ValidateAudience = true,
-                        ValidateLifetime = true,
-                        ValidateIssuerSigningKey = true,
-                        ValidIssuer = "coongchat.api",
-                        ValidAudience = "coongchat.client",
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("COONGCHAT_SUPER_SECRET_KEY_123456789"))
-                    };
-                });
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"],
+                    ValidAudience = builder.Configuration["Jwt:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])
+                    ),
+
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
 
             builder.Services.AddAuthorization(options =>
             {
@@ -98,25 +103,16 @@ namespace CoongChat.API
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             #endregion
 
-            #region  REGISTER MEDIATR 
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateUserCommand).Assembly));
+            #region  REGISTER MEDIATR  - VALIDATORS
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RegisterUserCommand).Assembly));
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(RefreshTokenCommand).Assembly));
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginCommand).Assembly));
-            #endregion
-
-            #region FLUENT VALIDATION
-            builder.Services.AddValidatorsFromAssembly(typeof(LoginCommandValidator).Assembly);
             builder.Services.AddValidatorsFromAssembly(typeof(RegisterUserCommandValidator).Assembly);
 
-            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>)
-);
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             #endregion
 
 
             builder.Services.AddAutoMapper(cfg => { }, typeof(UserProfile));
 
-            builder.Services.AddValidatorsFromAssemblyContaining<CreateUserCommandValidator>();
             builder.Services.AddFluentValidationAutoValidation();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -152,8 +148,8 @@ namespace CoongChat.API
 
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors("CorsPolicy");
-            app.UseAuthorization();
             app.UseAuthentication();
+            app.UseAuthorization();
 
 
 
