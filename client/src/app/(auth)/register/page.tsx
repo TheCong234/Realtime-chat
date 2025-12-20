@@ -1,26 +1,63 @@
+"use client";
 import Image from "next/image";
 import "../../globals.css";
 import Link from "next/link";
+import { useForm } from "react-hook-form";
+import { RegisterFormValues, registerSchema } from "@/features/auth/auth.schema";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { clearAuthError, registerRequest, resetRegisterStatus } from "@/features/auth/auth.slice";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { RootState } from "@/store";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Loader2Icon } from "lucide-react";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 
 const RegisterPage = () => {
+  const dispatch = useDispatch();
+  const { loading, error, registerStatus } = useSelector((state: RootState) => state.auth);
+  const router = useRouter();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterFormValues>({
+    resolver: yupResolver(registerSchema),
+  });
+
+  const onSubmit = (data: RegisterFormValues) => {
+    dispatch(registerRequest(data));
+  };
+
+  useEffect(() => {
+    if (registerStatus === "success") {
+      dispatch(resetRegisterStatus());
+      toast.success("Đăng ký thành công", {
+        description: "Bạn được chuyển tới trang chủ",
+      });
+      router.replace("/");
+    }
+    if (error) {
+      toast.error(error);
+      dispatch(clearAuthError());
+    }
+  }, [registerStatus, error]);
   return (
-    <div className="bg-gray-50 min-h-screen flex items-center justify-center">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 ">
+    <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="grid w-full max-w-6xl grid-cols-1 md:grid-cols-2">
         {/*left description */}
-        <div className="hidden md:block bg-gray-50 p-8">
-          <div className="flex items-center mb-6">
-            <Image
-              src="/assets/icons/window.svg"
-              className="w-4 h-5"
-              alt="Google icon"
-              width={20}
-              height={20}
-            />
-            <span className="ml-2 text-2xl font-bold text-gray-700">
-              CoongChat
-            </span>
+        <div className="hidden bg-gray-50 p-8 md:block">
+          <div className="mb-6 flex items-center">
+            <Image src="/assets/icons/window.svg" className="h-5 w-4" alt="Google icon" width={20} height={20} />
+            <span className="ml-2 text-2xl font-bold text-gray-700">CoongChat</span>
           </div>
-          <div className="flex gap-2 ">
+          <div className="flex gap-2">
             <svg
               viewBox="0 0 24 24"
               width="20"
@@ -30,11 +67,7 @@ const RegisterPage = () => {
               className="mt-1"
             >
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-              <g
-                id="SVGRepo_tracerCarrier"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></g>
+              <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
                 <path
                   fillRule="evenodd"
@@ -46,12 +79,10 @@ const RegisterPage = () => {
             </svg>
             <div>
               <h3 className="text-xl font-bold">Get started quickly</h3>
-              <p className="text-secondary">
-                Integrate with developer-friendly APIs or choose low-code.
-              </p>
+              <p className="text-secondary">Integrate with developer-friendly APIs or choose low-code.</p>
             </div>
           </div>
-          <div className="flex gap-2 mt-8">
+          <div className="mt-8 flex gap-2">
             <svg
               viewBox="0 0 24 24"
               width="20"
@@ -61,11 +92,7 @@ const RegisterPage = () => {
               className="mt-1"
             >
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-              <g
-                id="SVGRepo_tracerCarrier"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></g>
+              <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
                 <path
                   fillRule="evenodd"
@@ -77,12 +104,10 @@ const RegisterPage = () => {
             </svg>
             <div>
               <h3 className="text-xl font-bold">Get started quickly</h3>
-              <p className="text-secondary">
-                Integrate with developer-friendly APIs or choose low-code.
-              </p>
+              <p className="text-secondary">Integrate with developer-friendly APIs or choose low-code.</p>
             </div>
           </div>
-          <div className="flex gap-2 mt-8">
+          <div className="mt-8 flex gap-2">
             <svg
               viewBox="0 0 24 24"
               width="20"
@@ -92,11 +117,7 @@ const RegisterPage = () => {
               className="mt-1"
             >
               <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-              <g
-                id="SVGRepo_tracerCarrier"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              ></g>
+              <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
               <g id="SVGRepo_iconCarrier">
                 <path
                   fillRule="evenodd"
@@ -108,120 +129,98 @@ const RegisterPage = () => {
             </svg>
             <div>
               <h3 className="text-xl font-bold">Get started quickly</h3>
-              <p className="text-secondary">
-                Integrate with developer-friendly APIs or choose low-code.
-              </p>
+              <p className="text-secondary">Integrate with developer-friendly APIs or choose low-code.</p>
             </div>
           </div>
         </div>
 
         {/*Right: Form */}
-        <div className="p-8 bg-white rounded-xl shadow-md">
-          <h1 className="text-2xl font-bold mb-2">
-            Đăng ký 1 tài khoản để lưu giữ các câu chuyện của bạn
-          </h1>
-          <p className="text-gray-500 mb-6">
-            Bắt đầu chat trong thoáng chốc. Bạn đã có tài khoản?
-            <Link href="/login" className="text-blue-600 font-medium">
-              Đăng nhập.
-            </Link>
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-2">
-            {/*Fullname */}
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-2 ">
-                Tên đầy đủ
-              </label>
-              <input
-                type="text"
-                placeholder="Nguyễn Văn A"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
+        <form onSubmit={handleSubmit(onSubmit)} noValidate>
+          <Card className="rounded-xl shadow-md">
+            <CardHeader>
+              <CardTitle className="text-2xl">Đăng ký 1 tài khoản để lưu giữ các câu chuyện của bạn</CardTitle>
+              <CardDescription>
+                Bắt đầu chat trong thoáng chốc. Bạn đã có tài khoản?{" "}
+                <Link href="/login" className="text-primary font-medium">
+                  Đăng nhập
+                </Link>
+              </CardDescription>
+            </CardHeader>
 
-            {/*Email */}
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-2 ">
-                Email
-              </label>
-              <input
-                type="email"
-                placeholder="name@gmail.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
+            <CardContent>
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6">
+                {/* Full name */}
+                <div className="space-y-2">
+                  <Label htmlFor="fullName">Tên đầy đủ</Label>
+                  <Input id="fullName" placeholder="Nguyễn Văn A" {...register("fullName")} />
+                  {errors.fullName && <p className="text-destructive text-sm">{errors.fullName.message}</p>}
+                </div>
 
-            {/*Password */}
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mật khẩu
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
+                {/* Username */}
+                <div className="space-y-2">
+                  <Label htmlFor="username">Tên đăng nhập</Label>
+                  <Input id="username" placeholder="username" {...register("username")} />
+                  {errors.username && <p className="text-destructive text-sm">{errors.username.message}</p>}
+                </div>
 
-            {/*confirm Password */}
-            <div className="">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nhập lại Mật khẩu
-              </label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-            </div>
-          </div>
+                {/* Email */}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input id="email" type="email" placeholder="name@gmail.com" {...register("email")} />
+                  {errors.email && <p className="text-destructive text-sm">{errors.email.message}</p>}
+                </div>
 
-          {/*Remember + Forgot */}
-          <div className="  mb-2">
-            <label className="flex items-center text-sm text-gray-600">
-              <input
-                type="checkbox"
-                className="mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-              />
-              Remember me
-            </label>
-          </div>
+                {/* Password */}
+                <div className="space-y-2">
+                  <Label htmlFor="password">Mật khẩu</Label>
+                  <Input id="password" type="password" placeholder="••••••••" {...register("password")} />
+                  {errors.password && <p className="text-destructive text-sm">{errors.password.message}</p>}
+                </div>
 
-          {/*Submit */}
-          <button className="w-full mt-6 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 font-medium">
-            Đăng nhập
-          </button>
+                {/* Confirm password */}
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Nhập lại mật khẩu</Label>
+                  <Input id="confirmPassword" type="password" placeholder="••••••••" {...register("confirmPassword")} />
+                  {errors.confirmPassword && (
+                    <p className="text-destructive text-sm">{errors.confirmPassword.message}</p>
+                  )}
+                </div>
+              </div>
 
-          {/*Divider */}
-          <div className="flex items-center my-4">
-            <hr className="flex-grow border-gray-300" />
-            <span className="mx-2 text-gray-400">or</span>
-            <hr className="flex-grow border-gray-300" />
-          </div>
+              {/* Remember me */}
+              <div className="mt-4 flex items-center space-x-2">
+                <Checkbox id="remember" />
+                <Label htmlFor="remember" className="text-sm font-normal">
+                  Remember me
+                </Label>
+              </div>
 
-          {/*Social Login */}
-          <button className="w-full flex items-center justify-center gap-2 mb-3 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Image
-              src="/assets/icons/google.svg"
-              className="w-5 h-5"
-              alt="Google icon"
-              width={20}
-              height={20}
-            />
-            Đăng nhập với Google
-          </button>
+              {/* Submit */}
+              <Button type="submit" size="lg" className="mt-6 w-full" disabled={loading}>
+                {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                {loading ? "Đang đăng ký..." : "Đăng ký"}
+              </Button>
 
-          <button className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-            <Image
-              src="/assets/icons/facebook-color.svg"
-              className="w-5 h-5"
-              alt="Google icon"
-              width={20}
-              height={20}
-            />
-            Đăng nhập với Facebook
-          </button>
-        </div>
+              {/* Divider */}
+              <div className="my-6 flex items-center gap-3">
+                <Separator className="flex-1" />
+                <span className="text-muted-foreground text-sm">or</span>
+                <Separator className="flex-1" />
+              </div>
+
+              {/* Social login */}
+              <Button variant="outline" className="mb-3 w-full gap-2" type="button">
+                <Image src="/assets/icons/google.svg" alt="Google" width={20} height={20} />
+                Đăng nhập với Google
+              </Button>
+
+              <Button variant="outline" className="w-full gap-2" type="button">
+                <Image src="/assets/icons/facebook-color.svg" alt="Facebook" width={20} height={20} />
+                Đăng nhập với Facebook
+              </Button>
+            </CardContent>
+          </Card>
+        </form>
       </div>
     </div>
   );

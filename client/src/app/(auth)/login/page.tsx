@@ -6,12 +6,18 @@ import Link from "next/link";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { loginRequest } from "@/features/auth/auth.slice";
+import { clearAuthError, loginRequest } from "@/features/auth/auth.slice";
 import { useForm } from "react-hook-form";
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const LoginPage = () => {
   const dispatch = useDispatch();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const { loading, error, loginStatus } = useSelector((state: RootState) => state.auth);
+  const searchParams = useSearchParams();
+  const hasShownToast = useRef(false);
+  const router = useRouter();
 
   const {
     register,
@@ -24,6 +30,32 @@ const LoginPage = () => {
   const onSubmit = (data: LoginFormValues) => {
     dispatch(loginRequest(data));
   };
+
+  useEffect(() => {
+    if (searchParams.get("reason") === "unauthorized" && !hasShownToast.current) {
+      hasShownToast.current = true;
+      toast.error("Bạn chưa đăng nhập", {
+        description: "Vui lòng đăng nhập để tiếp tục",
+        action: {
+          label: "Ok",
+          onClick: () => toast.dismiss(),
+        },
+      });
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    if (loginStatus === "success") {
+      toast.success("Đăng nhập thành công", {
+        description: "Bạn được chuyển tới trang chủ",
+      });
+      router.replace("/");
+    }
+    if (error) {
+      toast.error(error);
+      dispatch(clearAuthError());
+    }
+  }, [loginStatus, error]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
