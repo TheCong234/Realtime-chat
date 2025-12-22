@@ -5,8 +5,10 @@ using MediatR;
 namespace CoongChat.Application.Features.Auth.Commands
 {
     public record RegisterUserCommand(
+        string? FullName,
     string Username,
     string Email,
-    string Password
+    string Password,
+    string? PhoneNumber
 ) : IRequest<BaseResponse<AuthDto>>;
 }

@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { LoginPayload, RegisterPayload, User } from "./auth.types";
+import { ILoginPayload, IRegisterPayload } from "./auth.types";
+import { IUser } from "../user/user.types";
 
 interface AuthState {
   loading: boolean;
-  user: User | null;
+  user: IUser | null;
   error: string | null;
   loginStatus: "idle" | "loading" | "success" | "error";
   registerStatus: "idle" | "loading" | "success" | "error";
+  getMeStatus: "idle" | "loading" | "success" | "error";
 }
 
 const initialState: AuthState = {
@@ -15,6 +17,7 @@ const initialState: AuthState = {
   error: null,
   loginStatus: "idle",
   registerStatus: "idle",
+  getMeStatus: "idle",
 };
 
 const authSlice = createSlice({
@@ -22,7 +25,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     //login
-    loginRequest(state, _action: PayloadAction<LoginPayload>) {
+    loginRequest(state, _action: PayloadAction<ILoginPayload>) {
       state.loading = true;
       state.error = null; // clear lỗi cũ
     },
@@ -40,7 +43,7 @@ const authSlice = createSlice({
     },
 
     //register
-    registerRequest(state, _action: PayloadAction<RegisterPayload>) {
+    registerRequest(state, _action: PayloadAction<IRegisterPayload>) {
       state.loading = true;
       state.error = null; // clear lỗi cũ
     },
@@ -55,6 +58,22 @@ const authSlice = createSlice({
     },
     resetRegisterStatus(state) {
       state.registerStatus = "idle";
+    },
+
+    //get me
+    getMeRequest(state, _action: PayloadAction<string>) {
+      state.loading = true;
+      state.error = null; // clear lỗi cũ
+    },
+    getMeSuccess(state, action: PayloadAction<IUser>) {
+      state.loading = false;
+      state.user = action.payload;
+      state.getMeStatus = "success";
+    },
+    getMeFailure(state, action: PayloadAction<string>) {
+      state.loading = false;
+      state.error = action.payload;
+      state.getMeStatus = "error";
     },
     //other
     clearAuthError(state) {
@@ -77,6 +96,9 @@ export const {
   registerFailure,
   resetLoginStatus,
   resetRegisterStatus,
+  getMeRequest,
+  getMeSuccess,
+  getMeFailure,
 } = authSlice.actions;
 
 export default authSlice.reducer;

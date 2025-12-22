@@ -1,6 +1,9 @@
+using System.Security.Claims;
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Auth.Commands;
 using CoongChat.Application.Features.Auth.DTOs;
+using CoongChat.Application.Features.Auth.Queries;
+using CoongChat.Application.Features.Users.DTOs;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,9 +27,11 @@ namespace CoongChat.API.Controllers
         {
             var result = await _mediator.Send(
                 new RegisterUserCommand(
+                    request.FullName,
                     request.Username,
                     request.Email,
-                    request.Password
+                    request.Password,
+                    request.PhoneNumber
                 )
             );
 
@@ -63,20 +68,13 @@ namespace CoongChat.API.Controllers
 
         [HttpGet("me")]
         [Authorize]
-        public IActionResult Me()
+        public async Task<ActionResult<BaseResponse<UserDto>>> GetMyProfile()
         {
-            var userId = User.FindFirst("sub")?.Value
-                         ?? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-
-            var username = User.Identity?.Name;
-            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
-
-            return Ok(new
-            {
-                userId,
-                username,
-                role
-            });
+            Guid userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "");
+            var result = await _mediator.Send(
+                new GetMyProfileQuery(userId)
+            );
+            return Ok(result);
         }
 
         [HttpGet("admin")]
