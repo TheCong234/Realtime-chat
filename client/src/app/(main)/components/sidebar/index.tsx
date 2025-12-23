@@ -46,7 +46,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-medium">Người dùng hiện tại</span>
+                      <span className="text-base font-medium">{currentUser?.fullName || currentUser?.username}</span>
                       <div className="flex items-center gap-1">
                         <StatusDot status={currentUser?.status || UserStatus.Offline} />
                         <span className="text-xs">{UserStatus[currentUser?.status || 0]}</span>
