@@ -2,6 +2,7 @@ using AutoMapper;
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Users.DTOs;
 using CoongChat.Application.Features.Users.Queries;
+using CoongChat.Application.Filters;
 using CoongChat.Application.Interfaces;
 using MediatR;
 
@@ -26,7 +27,7 @@ namespace CoongChat.Application.Features.Users.Handlers
             CancellationToken cancellationToken)
         {
             var data = await _repo.GetPagedAsync(
-                new Filters.GetUsersFilter
+                new GetUsersFilter
                 {
                     PageSize = request.PageSize,
                     PageNumber = request.PageNumber,
