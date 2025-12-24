@@ -105,7 +105,11 @@ namespace CoongChat.Infrastructure.Persistence
                     .HasConversion<int>();
 
                 e.Property(x => x.Name)
-                    .HasMaxLength(255);
+                    .HasMaxLength(255)
+                    .IsRequired(false);
+
+                e.Property(x => x.AvatarUrl)
+                    .IsRequired(false);
 
                 e.HasIndex(x => x.Type);
                 e.HasIndex(x => x.CreatedAt);
