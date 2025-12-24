@@ -1,3 +1,5 @@
+using CoongChat.Application.Common.Models;
+using CoongChat.Application.Filters;
 using CoongChat.Domain.Entities;
 
 namespace CoongChat.Application.Interfaces
@@ -6,7 +8,7 @@ namespace CoongChat.Application.Interfaces
     {
         Task<User?> GetByIdAsync(Guid id);
         Task<User?> GetByUsernameOrEmailAsync(string usernameOrEmail);
-        Task<List<User>> GetAllAsync();
+        Task<PagedResult<User>> GetPagedAsync(GetUsersFilter filter, CancellationToken cancellationToken);
         Task<Boolean> ExistsAsync(string username, string email);
 
         Task AddAsync(User user);

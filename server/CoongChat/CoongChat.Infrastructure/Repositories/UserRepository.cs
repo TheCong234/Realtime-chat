@@ -1,3 +1,5 @@
+using CoongChat.Application.Common.Models;
+using CoongChat.Application.Filters;
 using CoongChat.Application.Interfaces;
 using CoongChat.Domain.Entities;
 using CoongChat.Infrastructure.Persistence;
@@ -31,8 +33,57 @@ namespace CoongChat.Infrastructure.Repositories
             var user = await _context.RefreshTokens
                 .FirstOrDefaultAsync(rt => rt.UserId == userId);
         }
-        public async Task<List<User>> GetAllAsync()
-            => await _context.Users.AsNoTracking().ToListAsync();
+        public async Task<PagedResult<User>> GetPagedAsync(GetUsersFilter filter, CancellationToken cancellationToken)
+        {
+            var query = _context.Users
+                .AsNoTracking()
+                .Where(x => x.IsActive);
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                var keyword = filter.Search.Trim().ToLower();
+                query = query.Where(x =>
+                    x.Username.ToLower().Contains(keyword) ||
+                    x.Email.ToLower().Contains(keyword) ||
+                    (x.FullName != null && x.FullName.ToLower().Contains(keyword)));
+            }
+
+            if (filter.CreatedFrom.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt >= filter.CreatedFrom.Value);
+            }
+
+            if (filter.CreatedTo.HasValue)
+            {
+                query = query.Where(x => x.CreatedAt <= filter.CreatedTo.Value);
+            }
+
+            if (filter.Status.HasValue)
+            {
+                query = query.Where(x => x.Status == filter.Status.Value);
+            }
+            if (!string.IsNullOrWhiteSpace(filter.SortBy))
+            {
+                query = filter.IsDescending
+                    ? query.OrderByDescending(e => EF.Property<object>(e, filter.SortBy))
+                    : query.OrderBy(e => EF.Property<object>(e, filter.SortBy));
+            }
+
+            var totalCount = await query.CountAsync(cancellationToken);
+
+            var items = await query
+                .Skip((filter.PageNumber - 1) * filter.PageSize)
+                .Take(filter.PageSize)
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<User>
+            {
+                PageNumber = filter.PageNumber,
+                PageSize = filter.PageSize,
+                TotalCount = totalCount,
+                Items = items
+            };
+        }
 
         public async Task<User?> GetByIdAsync(Guid id)
             => await _context.Users.FindAsync(id);

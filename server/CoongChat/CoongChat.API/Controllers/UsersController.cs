@@ -1,4 +1,7 @@
 
+using CoongChat.Application.Common.Models;
+using CoongChat.Application.Features.Users.DTOs;
+using CoongChat.Application.Features.Users.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,4 +16,12 @@ public class UsersController : ControllerBase
         _mediator = mediator;
     }
 
+    [HttpGet("GetPaged")]
+    public async Task<ActionResult<BaseResponse<PagedResult<UserDto>>>> GetUsersPaged(
+            [FromQuery] GetUsersQuery query)
+    {
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
+    }
 }
