@@ -21,8 +21,13 @@ import Link from "next/link";
 import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { OptionDropdown } from "./OptionDropdown";
+import { RootState } from "@/store";
+import { useSelector } from "react-redux";
+import { UserStatus } from "@/constants/enum";
+import Image from "next/image";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user: currentUser } = useSelector((state: RootState) => state.auth);
   return (
     <Sidebar {...props}>
       <Tabs defaultValue="account">
@@ -32,14 +37,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="flex">
                 <SidebarMenuButton size="lg" asChild>
                   <Link href="/">
-                    <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                      <GalleryVerticalEnd className="size-4" />
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full">
+                      <Image
+                        src={currentUser?.avatarUrl || "/assets/images/no-profile-male-icon.png"}
+                        alt={currentUser?.fullName || "avatar"}
+                        fill
+                        className="object-cover"
+                      />
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
-                      <span className="font-medium">Người dùng hiện tại</span>
+                      <span className="text-base font-medium">{currentUser?.fullName || currentUser?.username}</span>
                       <div className="flex items-center gap-1">
-                        <StatusDot />
-                        <span className="text-xs">Online</span>
+                        <StatusDot status={currentUser?.status || UserStatus.Offline} />
+                        <span className="text-xs">{UserStatus[currentUser?.status || 0]}</span>
                       </div>
                     </div>
                   </Link>

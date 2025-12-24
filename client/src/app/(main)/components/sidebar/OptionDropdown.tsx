@@ -1,26 +1,33 @@
+"use client";
 import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
+import { logout } from "@/features/auth/auth.slice";
 import {
   ArchiveIcon,
   LockKeyholeIcon,
+  LogOutIcon,
   MessageCircleOffIcon,
-  MessageCircleQuestionMarkIcon,
   MessageSquareWarningIcon,
   SettingsIcon,
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
 
-const DropdownMenuItemCustom = ({ icon, label }: { icon: React.ReactNode; label: string }) => {
+const DropdownMenuItemCustom = ({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick?: () => void;
+}) => {
   return (
-    <DropdownMenuItem className="flex items-center gap-2">
+    <DropdownMenuItem className="flex items-center gap-2" onClick={onClick}>
       {icon}
       {label}
     </DropdownMenuItem>
@@ -28,6 +35,12 @@ const DropdownMenuItemCustom = ({ icon, label }: { icon: React.ReactNode; label:
 };
 
 export function OptionDropdown() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const handleLogout = () => {
+    dispatch(logout());
+    router.replace("/login");
+  };
   return (
     <DropdownMenuContent className="w-56" align="start">
       <DropdownMenuGroup>
@@ -45,7 +58,7 @@ export function OptionDropdown() {
       </DropdownMenuGroup>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItemCustom icon={<MessageCircleQuestionMarkIcon />} label="Tin nhắn đang chờ" />
+        <DropdownMenuItemCustom icon={<LogOutIcon />} label="Đăng xuất" onClick={handleLogout} />
       </DropdownMenuGroup>
     </DropdownMenuContent>
   );
