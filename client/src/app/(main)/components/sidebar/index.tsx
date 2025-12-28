@@ -22,15 +22,23 @@ import { DropdownMenu } from "@radix-ui/react-dropdown-menu";
 import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { OptionDropdown } from "./OptionDropdown";
 import { RootState } from "@/store";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { UserStatus } from "@/constants/enum";
 import Image from "next/image";
+import { useEffect } from "react";
+import { fetchConversations } from "@/features/conversations/conversation.slice";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const dispatch = useDispatch();
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { conversations, loading } = useSelector((state: RootState) => state.conversation);
+
+  useEffect(() => {
+    dispatch(fetchConversations());
+  }, [dispatch]);
   return (
     <Sidebar {...props}>
-      <Tabs defaultValue="account">
+      <Tabs defaultValue="all">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -124,8 +132,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {/* tab */}
             <SidebarMenuItem className="mt-3">
               <TabsList className="w-full">
-                <TabsTrigger value="account">Tất cả</TabsTrigger>
-                <TabsTrigger value="password">Chưa đọc</TabsTrigger>
+                <TabsTrigger value="all">Tất cả</TabsTrigger>
+                <TabsTrigger value="unread">Chưa đọc</TabsTrigger>
                 <TabsTrigger value="group">Nhóm</TabsTrigger>
                 <TabsTrigger value="community">Cộng đồng</TabsTrigger>
               </TabsList>
@@ -133,15 +141,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </SidebarMenu>
         </SidebarHeader>
         <SidebarContent className="p-2">
-          <TabsContent value="account">
-            {[...Array(3)].map((_, index) => (
-              <div key={index}>
-                <ChatCard name="Bich Lien" message="hello fen" messageId={index + 1 + ""} />
-              </div>
-            ))}
+          <TabsContent value="all">
+            {loading ? (
+              <div className="p-4 text-center text-sm text-gray-500">Loading...</div>
+            ) : (
+              conversations.map((conversation) => {
+                const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
+                const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
+                const avatarUrl = conversation.avatarUrl || partner?.avatarUrl || undefined;
+
+                return (
+                  <div key={conversation.id}>
+                    <ChatCard
+                      name={name}
+                      message={partner?.username || ""}
+                      messageId={conversation.id}
+                      avatarUrl={avatarUrl}
+                    />
+                  </div>
+                );
+              })
+            )}
           </TabsContent>
-          <TabsContent value="password">
-            <div>password tab content</div>
+          <TabsContent value="unread">
+            <div>unread tab content</div>
           </TabsContent>
           <TabsContent value="group">
             <div>group tab content</div>

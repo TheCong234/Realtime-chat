@@ -1,12 +1,13 @@
+using System.Security.Claims;
 using CoongChat.Application.Features.Messages.Commands.SendMessage;
+using CoongChat.Application.Features.Messages.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace CoongChat.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
     public class MessageController : ControllerBase
@@ -29,11 +30,23 @@ namespace CoongChat.API.Controllers
 
             command.CurrentUserId = Guid.Parse(userIdClaim);
             var result = await _mediator.Send(command);
-            
+
             if (!result.Success)
             {
-                 return BadRequest(result);
+                return BadRequest(result);
             }
+            return Ok(result);
+        }
+
+        [HttpGet("Conversation/{id}/GetPaged")]
+        public async Task<IActionResult> GetMessagesByConversationId(Guid id, [FromQuery] GetMessagesByConversationIdQuery query)
+        {
+            if (id != query.ConversationId)
+            {
+                query.ConversationId = id;
+            }
+
+            var result = await _mediator.Send(query);
             return Ok(result);
         }
     }

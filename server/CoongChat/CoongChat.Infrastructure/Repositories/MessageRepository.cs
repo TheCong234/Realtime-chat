@@ -1,6 +1,8 @@
 using CoongChat.Application.Interfaces;
 using CoongChat.Domain.Entities;
 using CoongChat.Infrastructure.Persistence;
+using CoongChat.Application.Common.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace CoongChat.Infrastructure.Repositories
 {
@@ -17,6 +19,28 @@ namespace CoongChat.Infrastructure.Repositories
         {
             _context.Messages.Add(message);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<PagedResult<Message>> GetPagedMessagesAsync(Guid conversationId, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        {
+            var query = _context.Messages
+                .Include(m => m.Sender)
+                .Where(m => m.ConversationId == conversationId)
+                .OrderByDescending(m => m.CreatedAt);
+
+            var totalCount = await query.CountAsync(cancellationToken);
+            var items = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync(cancellationToken);
+
+            return new PagedResult<Message>
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalCount = totalCount,
+                Items = items
+            };
         }
     }
 }

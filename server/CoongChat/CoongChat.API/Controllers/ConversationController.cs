@@ -1,13 +1,13 @@
 using System.Security.Claims;
 using CoongChat.Application.Features.Conversations.Commands.CreatePrivateConversation;
-using CoongChat.Application.Features.Users.Queries;
+using CoongChat.Application.Features.Conversations.Queries.GetMyConversations;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CoongChat.API.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v1/[controller]")]
     [ApiController]
     [Authorize]
     public class ConversationController : ControllerBase
@@ -19,7 +19,7 @@ namespace CoongChat.API.Controllers
             _mediator = mediator;
         }
 
-        [HttpPost("private")]
+        [HttpPost("Private")]
         public async Task<IActionResult> CreatePrivateConversation([FromBody] CreatePrivateConversationCommand command)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -33,16 +33,18 @@ namespace CoongChat.API.Controllers
             return Ok(result);
         }
 
-        [HttpGet("Conversations")]
-        public async Task<IActionResult> GetMyConversations([FromQuery] GetUsersQuery query)
+        [HttpGet("GetPaged")]
+        public async Task<IActionResult> GetMyConversations([FromQuery] GetMyConversationsQuery query)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim))
             {
                 return Unauthorized();
             }
+            query.CurrentUserId = Guid.Parse(userIdClaim);
             var result = await _mediator.Send(query);
             return Ok(result);
         }
+
     }
 }

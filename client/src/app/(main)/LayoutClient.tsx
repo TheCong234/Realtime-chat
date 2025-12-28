@@ -23,9 +23,9 @@ export default function LayoutClient({ children }: Readonly<{ children: React.Re
 
   useEffect(() => {
     if (getMeStatus === "error") {
-      localStorage.removeItem("accessToken");
-      localStorage.removeItem("refreshToken");
-      toast.error("Lỗi khi lấy thông tin người dùng", { description: error });
+      // localStorage.removeItem("accessToken");
+      // localStorage.removeItem("refreshToken");
+      toast.error("Lỗi khi lấy thông tin người dùng, vui lòng đăng nhập lại", { description: error });
       dispatch(clearAuthError());
       router.replace("/login");
     }
