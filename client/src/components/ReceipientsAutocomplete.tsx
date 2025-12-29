@@ -11,7 +11,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Option = { label: string; value: string };
 
-interface MultiAutocompleteProps {
+interface IMultiAutocompleteProps {
   options: Option[];
   values: Option[];
   onChange: (opts: Option[]) => void;
@@ -25,7 +25,7 @@ export function ReceipientsAutocomplete({
   onChange,
   placeholder = "Chọn người nhận...",
   className,
-}: MultiAutocompleteProps) {
+}: IMultiAutocompleteProps) {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState("");
 

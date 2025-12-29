@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
+import { toast } from "sonner";
 
 const DropdownMenuItemCustom = ({
   icon,
@@ -39,6 +40,7 @@ export function OptionDropdown() {
   const router = useRouter();
   const handleLogout = () => {
     dispatch(logout());
+    toast.success("Đăng xuất thành công");
     router.replace("/login");
   };
   return (

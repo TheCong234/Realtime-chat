@@ -5,3 +5,12 @@ export const AUTH_API = {
   REGISTER: `${apiVersion}/Auth/register`,
   GET_ME: `${apiVersion}/Auth/me`,
 };
+
+export const CONVERSATION_API = {
+  GET_PAGED: `${apiVersion}/Conversation/GetPaged`,
+};
+
+export const MESSAGE_API = {
+  GET_BY_CONVERSATION_ID: `${apiVersion}/Message/Conversation`,
+  SEND: `${apiVersion}/Message`,
+};

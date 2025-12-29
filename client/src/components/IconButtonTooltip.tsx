@@ -1,12 +1,8 @@
 import { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
-interface IconButtonTooltipProps {
+interface IIconButtonTooltipProps {
   icon: ReactNode;
   tooltip: string;
   onClick?: () => void;
@@ -24,7 +20,7 @@ export function IconButtonTooltip({
   iconClassName,
   variant = "secondary",
   size = "icon",
-}: IconButtonTooltipProps) {
+}: IIconButtonTooltipProps) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>

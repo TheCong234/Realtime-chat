@@ -3,13 +3,13 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { InfoIcon, PhoneIcon, VideoIcon } from "lucide-react";
 import React from "react";
 
-interface ToolbarProps {
+interface IToolbarProps {
   name: string;
   avatar: string;
   status: string;
   setShowInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const Toolbar = React.memo(({ name, avatar, status, setShowInfo }: ToolbarProps) => {
+const Toolbar = React.memo(({ name, avatar, status, setShowInfo }: IToolbarProps) => {
   return (
     <div className="border-border flex items-center justify-between border-b p-3">
       <div className="flex items-center gap-3">

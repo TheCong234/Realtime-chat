@@ -24,6 +24,7 @@ export enum MessageType {
   Text = 0,
   Image = 1,
   File = 2,
+  Sticker = 3,
 }
 
 export enum MessageReadStatus {

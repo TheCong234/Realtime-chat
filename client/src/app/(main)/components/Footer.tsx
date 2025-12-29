@@ -2,8 +2,30 @@ import { IconButtonTooltip } from "@/components/IconButtonTooltip";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { MicIcon, ImageIcon, StickerIcon, GiftIcon, SmileIcon } from "lucide-react";
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { useParams } from "next/navigation";
+import { sendMessage } from "@/features/messages/message.slice";
 
 const Footer = () => {
+  const [content, setContent] = useState("");
+  const dispatch = useDispatch();
+  const params = useParams();
+  const conversationId = params.id as string;
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && content.trim()) {
+      dispatch(
+        sendMessage({
+          conversationId,
+          type: 0, // Text message
+          content: content.trim(),
+        }),
+      );
+      setContent("");
+    }
+  };
+
   return (
     <div className="flex gap-2 p-3">
       <IconButtonTooltip
@@ -29,6 +51,9 @@ const Footer = () => {
           type="text"
           placeholder="Aa"
           className="flex-1 rounded-full border-none bg-gray-200 pr-12 outline-none focus:bg-gray-300 focus-visible:ring-0 focus-visible:ring-offset-0"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <Button
           type="button"

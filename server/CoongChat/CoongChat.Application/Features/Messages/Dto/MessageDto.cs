@@ -1,4 +1,5 @@
 using CoongChat.Domain.Common;
+using CoongChat.Application.Features.Users.DTOs;
 
 namespace CoongChat.Application.Features.Messages.Dto
 {
@@ -10,6 +11,7 @@ namespace CoongChat.Application.Features.Messages.Dto
         public MessageType Type { get; set; }
         public string Content { get; set; }
         public DateTime CreatedAt { get; set; }
+        public UserDto? Sender { get; set; }
         // Can add attachments or status here later if needed
     }
 }
