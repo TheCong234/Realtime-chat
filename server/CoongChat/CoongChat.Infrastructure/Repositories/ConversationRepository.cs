@@ -60,6 +60,7 @@ namespace CoongChat.Infrastructure.Repositories
         {
             return await _context.Conversations
                 .Include(c => c.Members)
+                    .ThenInclude(m => m.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == conversationId, cancellationToken);
         }

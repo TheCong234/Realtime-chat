@@ -1,6 +1,6 @@
 import { MessageType } from "@/constants/enum";
 
-export interface MessageSender {
+export interface IMessageSender {
   id: string;
   username: string;
   fullName: string | null;
@@ -16,17 +16,17 @@ export interface MessageSender {
   role: string;
 }
 
-export interface Message {
+export interface IMessage {
   id: string;
   conversationId: string;
   senderId: string;
   type: MessageType;
   content: string;
   createdAt: string;
-  sender: MessageSender;
+  sender: IMessageSender;
 }
 
-export interface SendMessagePayload {
+export interface ISendMessagePayload {
   conversationId: string;
   type: number;
   content: string;

@@ -1,83 +1,12 @@
 "use client";
 import { Input } from "@/components/ui/input";
 import Footer from "../components/Footer";
-import { ChatMessageData } from "@/types/chat";
+import { IChatMessageData } from "@/types/chat";
 import { ChatMessage } from "../messenger/[id]/ChatMessage";
 import { ReceipientsAutocomplete } from "@/components/ReceipientsAutocomplete";
 import { useState } from "react";
-
-const messages: ChatMessageData[] = [
-  {
-    id: "1",
-    senderId: "u1",
-    isMe: false,
-    type: "text",
-    content: "Hello 👋",
-  },
-  {
-    id: "2",
-    senderId: "me",
-    isMe: true,
-    type: "image",
-    content: "/assets/images/demo/because.jpeg",
-  },
-  {
-    id: "3",
-    senderId: "u1",
-    isMe: false,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "4",
-    senderId: "me",
-    isMe: true,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "5",
-    senderId: "u1",
-    isMe: false,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "6",
-    senderId: "me",
-    isMe: true,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "7",
-    senderId: "u1",
-    isMe: false,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "8",
-    senderId: "me",
-    isMe: true,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "9",
-    senderId: "u1",
-    isMe: false,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-  {
-    id: "10",
-    senderId: "me",
-    isMe: true,
-    type: "text",
-    content: "I'm good, thanks!",
-  },
-];
+import { IMessage } from "@/features/messages/message.type";
+import { MessageType } from "@/constants/enum";
 
 const options = [
   { value: "react", label: "React" },
@@ -108,9 +37,9 @@ const NewChatPage = () => {
       </div>
       <div className="h-full overflow-auto p-3">
         <div className="flex flex-col gap-2">
-          {messages.map((msg) => (
+          {/* {messages.map((msg) => (
             <ChatMessage key={msg.id} message={msg} />
-          ))}
+          ))} */}
         </div>
       </div>
       <Footer />

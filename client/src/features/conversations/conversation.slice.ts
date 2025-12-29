@@ -1,8 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Conversation, ConversationState } from "./conversation.type";
+import { IConversation, IConversationState } from "./conversation.type";
 
-const initialState: ConversationState = {
+const initialState: IConversationState = {
   conversations: [],
+  conversation: null,
   loading: false,
 };
 
@@ -13,11 +14,23 @@ const conversationSlice = createSlice({
     fetchConversations(state) {
       state.loading = true;
     },
-    fetchConversationsSuccess(state, action: PayloadAction<Conversation[]>) {
+    fetchConversationsSuccess(state, action: PayloadAction<IConversation[]>) {
       state.loading = false;
       state.conversations = action.payload;
     },
     fetchConversationsFailed(state) {
+      state.loading = false;
+    },
+
+    //get conversation details
+    fetchConversationDetails(state) {
+      state.loading = true;
+    },
+    fetchConversationDetailsSuccess(state, action: PayloadAction<IConversation>) {
+      state.loading = false;
+      state.conversation = action.payload;
+    },
+    fetchConversationDetailsFailed(state) {
       state.loading = false;
     },
   },

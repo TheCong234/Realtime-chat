@@ -2,14 +2,14 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import StatusDot from "../../../components/StatusDot";
 import Link from "next/link";
 
-interface ChatCardProps {
+interface IChatCardProps {
   name: string;
   message: string;
   messageId: string;
   avatarUrl?: string;
 }
 
-export function ChatCard({ messageId, name, message, avatarUrl = "/assets/images/no-avatar.png" }: ChatCardProps) {
+export function ChatCard({ messageId, name, message, avatarUrl = "/assets/images/no-avatar.png" }: IChatCardProps) {
   return (
     <Link
       className="hover:bg-accent flex cursor-pointer items-center gap-3 rounded-lg p-2"

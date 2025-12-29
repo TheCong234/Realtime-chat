@@ -1,5 +1,5 @@
 "use client";
-import { ChatMessageData, MessageType } from "@/types/chat";
+import { IChatMessageData, MessageType } from "@/types/chat";
 import Footer from "../../components/Footer";
 import Toolbar from "../../components/Toolbar";
 import { ChatMessage } from "./ChatMessage";
@@ -30,7 +30,7 @@ const ChatPage = () => {
     <div className="flex h-full gap-4">
       <div className="flex h-full flex-1 flex-col justify-between rounded-xl bg-white shadow-xl">
         <Toolbar
-          name="Trần Thế Công" // TODO: Fetch conversation details for title
+          name="Trần Thế Công"
           avatar="/assets/images/no-avatar.png"
           status="Hoạt động 2 phút trước"
           setShowInfo={setShowInfo}

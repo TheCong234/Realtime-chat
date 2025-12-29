@@ -1,13 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Message, SendMessagePayload } from "./message.type";
+import { IMessage, ISendMessagePayload } from "./message.type";
 
-interface MessageState {
-  messages: Message[];
+interface IMessageState {
+  messages: IMessage[];
   loading: boolean;
   error: string | null;
 }
 
-const initialState: MessageState = {
+const initialState: IMessageState = {
   messages: [],
   loading: false,
   error: null,
@@ -21,7 +21,7 @@ const messageSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    fetchMessagesSuccess(state, action: PayloadAction<Message[]>) {
+    fetchMessagesSuccess(state, action: PayloadAction<IMessage[]>) {
       state.loading = false;
       state.messages = action.payload.reverse();
     },
@@ -35,11 +35,11 @@ const messageSlice = createSlice({
     },
 
     // Send Message Actions
-    sendMessage(state, _action: PayloadAction<SendMessagePayload>) {
+    sendMessage(state, _action: PayloadAction<ISendMessagePayload>) {
       state.loading = true;
       state.error = null;
     },
-    sendMessageSuccess(state, action: PayloadAction<Message>) {
+    sendMessageSuccess(state, action: PayloadAction<IMessage>) {
       state.loading = false;
       state.messages = state.messages.concat(action.payload);
     },

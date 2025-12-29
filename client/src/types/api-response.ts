@@ -1,16 +1,16 @@
-import { Message } from "@/features/messages/message.type";
+import { IMessage } from "@/features/messages/message.type";
 
-export interface BaseResponse<T> {
+export interface IBaseResponse<T> {
   success: boolean;
   data: T;
   message: string;
 }
 
-export interface PagedResult<T> {
+export interface IPagedResult<T> {
   pageNumber: number;
   pageSize: number;
   totalCount: number;
   items: T[];
 }
 
-export type MessagePagedResult = PagedResult<Message>;
+export type IMessagePagedResult = IPagedResult<IMessage>;

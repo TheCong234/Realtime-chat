@@ -1,14 +1,14 @@
 import { cn } from "@/lib/utils";
-import { Message } from "@/features/messages/message.type";
+import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { MessageType } from "@/constants/enum";
 
-interface Props {
-  message: Message;
+interface IProps {
+  message: IMessage;
 }
 
-export function MessageContent({ message }: Props) {
+export function MessageContent({ message }: IProps) {
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
   const baseClass = cn(
     "rounded-2xl px-4 py-2 text-sm break-words",

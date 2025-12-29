@@ -1,7 +1,7 @@
 import { UserStatus } from "@/constants/enum";
 import { cn } from "@/lib/utils";
 
-interface StatusDotProps {
+interface IStatusDotProps {
   status?: UserStatus;
   size?: "sm" | "md" | "lg";
   showPulse?: boolean;
@@ -29,7 +29,7 @@ const sizeConfig = {
   lg: "h-4 w-4",
 };
 
-const StatusDot = ({ status = UserStatus.Offline, size = "sm", showPulse = true, className }: StatusDotProps) => {
+const StatusDot = ({ status = UserStatus.Offline, size = "sm", showPulse = true, className }: IStatusDotProps) => {
   const config = statusConfig[status];
   const sizeClass = sizeConfig[size];
   const shouldAnimate = showPulse && status === UserStatus.Online;

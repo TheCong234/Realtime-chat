@@ -1,6 +1,6 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { messageService } from "./message.service";
-import { Message, SendMessagePayload } from "./message.type";
+import { IMessage, ISendMessagePayload } from "./message.type";
 import {
   fetchMessages,
   fetchMessagesFailed,
@@ -10,12 +10,12 @@ import {
   sendMessageSuccess,
 } from "./message.slice";
 import { PayloadAction } from "@reduxjs/toolkit";
-import { MessagePagedResult } from "@/types/api-response";
+import { IMessagePagedResult } from "@/types/api-response";
 
 function* fetchMessagesSaga(action: PayloadAction<string>) {
   try {
     const conversationId = action.payload;
-    const response: MessagePagedResult = yield call(messageService.getMessages, conversationId);
+    const response: IMessagePagedResult = yield call(messageService.getMessages, conversationId);
     yield put(fetchMessagesSuccess(response.items));
   } catch (error: any) {
     console.log("Failed to fetch messages", error);
@@ -23,9 +23,9 @@ function* fetchMessagesSaga(action: PayloadAction<string>) {
   }
 }
 
-function* sendMessageSaga(action: PayloadAction<SendMessagePayload>) {
+function* sendMessageSaga(action: PayloadAction<ISendMessagePayload>) {
   try {
-    const response: Message = yield call(messageService.sendMessage, action.payload);
+    const response: IMessage = yield call(messageService.sendMessage, action.payload);
     yield put(sendMessageSuccess(response));
   } catch (error: any) {
     console.log("Failed to send message", error);

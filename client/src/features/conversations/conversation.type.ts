@@ -1,4 +1,4 @@
-export interface Member {
+export interface IMember {
   userId: string;
   username: string;
   fullName: string | null;
@@ -6,16 +6,17 @@ export interface Member {
   role: number;
 }
 
-export interface Conversation {
+export interface IConversation {
   id: string;
   type: number;
   name: string | null;
   avatarUrl: string | null;
   createdAt: string;
-  members: Member[];
+  members: IMember[];
 }
 
-export interface ConversationState {
-  conversations: Conversation[];
+export interface IConversationState {
+  conversations: IConversation[];
+  conversation: IConversation | null;
   loading: boolean;
 }
