@@ -1,4 +1,5 @@
 import { UserStatus } from "@/constants/enum";
+import { IMessage } from "../messages/message.type";
 
 export interface IMember {
   userId: string;
@@ -16,6 +17,7 @@ export interface IConversation {
   avatarUrl: string | null;
   createdAt: string;
   members: IMember[];
+  lastMessage: IMessage | null;
 }
 
 export interface IConversationState {

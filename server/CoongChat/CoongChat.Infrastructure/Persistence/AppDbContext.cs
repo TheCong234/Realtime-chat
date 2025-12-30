@@ -114,6 +114,11 @@ namespace CoongChat.Infrastructure.Persistence
                 e.HasIndex(x => x.Type);
                 e.HasIndex(x => x.CreatedAt);
             });
+            builder.Entity<Conversation>()
+                .HasOne(c => c.LastMessage)
+                .WithMany() // Không cần ngược lại từ Message
+                .HasForeignKey(c => c.LastMessageId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             /* =======================
              * CONVERSATION MEMBER

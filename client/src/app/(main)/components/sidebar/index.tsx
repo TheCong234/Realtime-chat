@@ -154,8 +154,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <div key={conversation.id}>
                     <ChatCard
                       name={name}
-                      message={partner?.username || ""}
-                      messageId={conversation.id}
+                      lastMessage={conversation.lastMessage || null}
+                      conversationId={conversation.id}
                       avatarUrl={avatarUrl}
                     />
                   </div>

@@ -65,6 +65,9 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
 
             await _messageRepository.AddAsync(message, cancellationToken);
 
+            conversation.LastMessageId = message.Id;
+            await _conversationRepository.UpdateAsync(conversation, cancellationToken);
+
             return BaseResponse<MessageDto>.Ok(_mapper.Map<MessageDto>(message), "Tin nhắn đã được gửi"
             );
         }

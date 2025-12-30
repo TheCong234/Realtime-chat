@@ -4,6 +4,7 @@ using CoongChat.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CoongChat.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251230162843_AddLastMessageToConversation")]
+    partial class AddLastMessageToConversation
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,6 +40,9 @@ namespace CoongChat.Infrastructure.Migrations
                     b.Property<Guid?>("LastMessageId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("LastMessageId1")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Name")
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
@@ -48,7 +54,7 @@ namespace CoongChat.Infrastructure.Migrations
 
                     b.HasIndex("CreatedAt");
 
-                    b.HasIndex("LastMessageId");
+                    b.HasIndex("LastMessageId1");
 
                     b.HasIndex("Type");
 
@@ -354,8 +360,7 @@ namespace CoongChat.Infrastructure.Migrations
                 {
                     b.HasOne("CoongChat.Domain.Entities.Message", "LastMessage")
                         .WithMany()
-                        .HasForeignKey("LastMessageId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("LastMessageId1");
 
                     b.Navigation("LastMessage");
                 });
