@@ -18,6 +18,7 @@ namespace CoongChat.Application.Features.Conversations.Dto
         public string Username { get; set; }
         public string FullName { get; set; }
         public string AvatarUrl { get; set; }
+        public UserStatus userStatus { get; set; }
         public ConversationRole Role { get; set; }
     }
 }
