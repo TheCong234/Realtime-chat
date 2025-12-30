@@ -11,4 +11,11 @@ export const conversationService = {
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
   },
+
+  getConversationById: async (id: string): Promise<IConversation> => {
+    const url = CONVERSATION_API.GET_BY_ID(id);
+    return axiosClient.get(url, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+    });
+  },
 };

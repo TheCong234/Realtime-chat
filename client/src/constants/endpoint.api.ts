@@ -8,6 +8,7 @@ export const AUTH_API = {
 
 export const CONVERSATION_API = {
   GET_PAGED: `${apiVersion}/Conversation/GetPaged`,
+  GET_BY_ID: (id: string) => `${apiVersion}/Conversation/${id}`,
 };
 
 export const MESSAGE_API = {

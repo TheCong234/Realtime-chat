@@ -1,9 +1,12 @@
+import { UserStatus } from "@/constants/enum";
+
 export interface IMember {
   userId: string;
   username: string;
   fullName: string | null;
   avatarUrl: string | null;
   role: number;
+  status: UserStatus;
 }
 
 export interface IConversation {

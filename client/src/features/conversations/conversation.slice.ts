@@ -23,7 +23,7 @@ const conversationSlice = createSlice({
     },
 
     //get conversation details
-    fetchConversationDetails(state) {
+    fetchConversationDetails(state, action: PayloadAction<string>) {
       state.loading = true;
     },
     fetchConversationDetailsSuccess(state, action: PayloadAction<IConversation>) {
@@ -36,5 +36,12 @@ const conversationSlice = createSlice({
   },
 });
 
-export const { fetchConversations, fetchConversationsSuccess, fetchConversationsFailed } = conversationSlice.actions;
+export const {
+  fetchConversations,
+  fetchConversationsSuccess,
+  fetchConversationsFailed,
+  fetchConversationDetails,
+  fetchConversationDetailsSuccess,
+  fetchConversationDetailsFailed,
+} = conversationSlice.actions;
 export default conversationSlice.reducer;
