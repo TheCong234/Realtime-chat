@@ -1,5 +1,4 @@
 import axios from "axios";
-import { BaseResponse } from "@/types/api-response";
 
 export const axiosClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -8,14 +7,14 @@ export const axiosClient = axios.create({
 
 axiosClient.interceptors.response.use(
   (response) => {
-    const res = response.data as BaseResponse<any>;
+    const res = response.data;
 
     if (!res.success) {
       return Promise.reject({
         message: res.message,
       });
     }
-    return res.data;
+    return res;
   },
   (error) => {
     return Promise.reject({

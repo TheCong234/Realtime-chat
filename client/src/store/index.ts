@@ -5,6 +5,7 @@ import conversationReducer from "@/features/conversations/conversation.slice";
 import rootSaga from "./rootSaga";
 
 import messageReducer from "@/features/messages/message.slice";
+import userReducer from "@/features/user/user.slice";
 
 const sagaMiddleware = createSagaMiddleware();
 
@@ -13,6 +14,7 @@ export const store = configureStore({
     auth: authReducer,
     conversation: conversationReducer,
     message: messageReducer,
+    user: userReducer,
   },
   middleware: (gDM) => gDM({ thunk: false }).concat(sagaMiddleware),
 });

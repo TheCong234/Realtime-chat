@@ -1,10 +1,10 @@
 import { axiosClient } from "@/lib/axios";
-import { IPagedResult } from "@/types/api-response";
+import { IBaseResponse, IPagedResult } from "@/types/api-response";
 import { IConversation } from "./conversation.type";
 import { CONVERSATION_API } from "@/constants/endpoint.api";
 
 export const conversationService = {
-  getConversations: async (): Promise<IPagedResult<IConversation>> => {
+  getConversations: async (): Promise<IBaseResponse<IPagedResult<IConversation>>> => {
     const url = CONVERSATION_API.GET_PAGED;
     return axiosClient.get(url, {
       params: { values: "all" },
@@ -12,7 +12,7 @@ export const conversationService = {
     });
   },
 
-  getConversationById: async (id: string): Promise<IConversation> => {
+  getConversationById: async (id: string): Promise<IBaseResponse<IConversation>> => {
     const url = CONVERSATION_API.GET_BY_ID(id);
     return axiosClient.get(url, {
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },

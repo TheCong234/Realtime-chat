@@ -8,6 +8,7 @@ using CoongChat.Application.Interfaces;
 using CoongChat.Infrastructure.Identity;
 using CoongChat.Infrastructure.Persistence;
 using CoongChat.Infrastructure.Repositories;
+using CoongChat.Infrastructure.Services;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -103,6 +104,7 @@ namespace CoongChat.API
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+            builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
             #endregion
 
             #region  REGISTER MEDIATR  - VALIDATORS
@@ -148,6 +150,7 @@ namespace CoongChat.API
                 app.UseSwaggerUI();
             }
 
+            app.UseStaticFiles(); // Serve uploaded files from wwwroot
             app.UseMiddleware<ExceptionHandlingMiddleware>();
             app.UseCors("CorsPolicy");
             app.UseAuthentication();
