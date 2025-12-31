@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import StatusDot from "../../../components/StatusDot";
 import Link from "next/link";
@@ -9,7 +10,6 @@ import { cn, timeAgo } from "@/lib/utils";
 import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { IMAGE_DOMAIN } from "@/environments";
 
 interface IChatCardProps {
   name: string;
@@ -20,12 +20,20 @@ interface IChatCardProps {
 }
 
 export function ChatCard({ conversationId, name, lastMessage, avatarUrl, isGroup = false }: IChatCardProps) {
+  const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
+
+  const isActive = pathname === `/messenger/${conversationId}`;
+
   return (
     <div className="group/chatcard relative">
       <Link
-        className="hover:bg-accent flex cursor-pointer items-center gap-3 rounded-lg p-1"
+        className={cn(
+          "flex cursor-pointer items-center gap-3 rounded-lg p-1 transition-colors",
+          "hover:bg-accent",
+          isActive && "bg-accent border-primary border-l-4",
+        )}
         href={`/messenger/${conversationId}`}
       >
         <div className="relative">
@@ -38,7 +46,7 @@ export function ChatCard({ conversationId, name, lastMessage, avatarUrl, isGroup
         </div>
 
         <div className="w-full">
-          <p className="truncate font-medium">{name}</p>
+          <p className={cn("truncate font-medium", isActive && "font-semibold")}>{name}</p>
           <div className="flex items-center justify-between">
             <span className="text-muted-foreground truncate text-xs">
               {lastMessage?.senderId === currentUser?.id
@@ -57,7 +65,7 @@ export function ChatCard({ conversationId, name, lastMessage, avatarUrl, isGroup
           isDropdownOpen ? "opacity-100" : "opacity-0 group-hover/chatcard:opacity-100",
         )}
       >
-        <ChatCardDropdown isGroup={isGroup} onOpenChange={setIsDropdownOpen} />
+        <ChatCardDropdown isGroup={isGroup} onOpenChange={setIsDropdownOpen} conversationId={conversationId} />
       </div>
     </div>
   );

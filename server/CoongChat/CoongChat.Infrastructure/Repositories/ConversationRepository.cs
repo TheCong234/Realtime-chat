@@ -32,9 +32,12 @@ namespace CoongChat.Infrastructure.Repositories
             var query = _context.Conversations
                 .Include(c => c.Members)
                     .ThenInclude(m => m.User)
-                 .Include(c => c.LastMessage)
+                .Include(c => c.LastMessage)
                     .ThenInclude(m => m.Sender)
-                .Where(c => c.Members.Any(m => m.UserId == userId))
+                .Where(c => c.Members.Any(m => 
+                    m.UserId == userId && 
+                    (m.DeletedAt == null || (c.LastMessage != null && c.LastMessage.CreatedAt > m.DeletedAt))
+                ))
                 .AsNoTracking();
             var totalCount = await query.CountAsync(cancellationToken);
 
@@ -70,6 +73,18 @@ namespace CoongChat.Infrastructure.Repositories
         public async Task UpdateAsync(Conversation conversation, CancellationToken cancellationToken)
         {
             _context.Conversations.Update(conversation);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task<ConversationMember?> GetMemberAsync(Guid conversationId, Guid userId, CancellationToken cancellationToken)
+        {
+            return await _context.ConversationMembers
+                .FirstOrDefaultAsync(m => m.ConversationId == conversationId && m.UserId == userId, cancellationToken);
+        }
+
+        public async Task UpdateMemberAsync(ConversationMember member, CancellationToken cancellationToken)
+        {
+            _context.ConversationMembers.Update(member);
             await _context.SaveChangesAsync(cancellationToken);
         }
     }

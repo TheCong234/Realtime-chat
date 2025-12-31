@@ -89,7 +89,7 @@ src/
 - **Accent color**: `#CD7F32` (bronze)
 - **Responsive**: Mobile-first approach
 - **Dark mode**: Hỗ trợ đầy đủ via `next-themes`
-- **Loading state**: Bắt buộc cho mọi API call
+- **Loading state**: Bắt buộc cho mọi API call, có thể sử dụng Skeleton loading cho UI
 - **Error handling**: Hiển thị lỗi thân thiện cho người dùng
 - **Toast notifications**: Sử dụng `sonner` library
 

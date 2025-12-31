@@ -7,5 +7,12 @@ namespace CoongChat.Application.Features.Messages.Queries
     public class GetMessagesByConversationIdQuery : BaseFilter, IRequest<BaseResponse<PagedResult<MessageDto>>>
     {
         public Guid ConversationId { get; set; }
+        public Guid CurrentUserId { get; set; }
+
+        public GetMessagesByConversationIdQuery(Guid conversationId, Guid currentUserId)
+        {
+            ConversationId = conversationId;
+            CurrentUserId = currentUserId;
+        }
     }
 }

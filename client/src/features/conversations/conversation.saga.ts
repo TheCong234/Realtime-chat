@@ -9,8 +9,12 @@ import {
   fetchConversationDetails,
   fetchConversationDetailsSuccess,
   fetchConversationDetailsFailed,
+  clearHistory,
+  clearHistorySuccess,
+  clearHistoryFailed,
 } from "./conversation.slice";
 import { IBaseResponse, IPagedResult } from "@/types/api-response";
+import { toast } from "sonner";
 
 function* fetchConversationsSaga() {
   try {
@@ -34,7 +38,21 @@ function* fetchConversationDetailsSaga(action: PayloadAction<string>) {
   }
 }
 
+function* clearHistorySaga(action: PayloadAction<string>) {
+  try {
+    const conversationId = action.payload;
+    yield call(conversationService.clearHistory, conversationId);
+    yield put(clearHistorySuccess());
+    toast.success("Đã xóa lịch sử chat thành công");
+  } catch (error: any) {
+    console.log("Failed to clear conversation history", error);
+    yield put(clearHistoryFailed());
+    toast.error(error?.response?.data?.message || "Xóa lịch sử chat thất bại");
+  }
+}
+
 export function* conversationSaga() {
   yield takeLatest(fetchConversations.type, fetchConversationsSaga);
   yield takeLatest(fetchConversationDetails.type, fetchConversationDetailsSaga);
+  yield takeLatest(clearHistory.type, clearHistorySaga);
 }

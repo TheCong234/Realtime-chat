@@ -20,8 +20,8 @@ const ChatPage = () => {
   const dispatch = useDispatch();
 
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
-  const { messages, loading } = useSelector((state: RootState) => state.message);
-  const { conversation, loading: conversationLoading } = useSelector((state: RootState) => state.conversation);
+  const { messages } = useSelector((state: RootState) => state.message);
+  const { conversation } = useSelector((state: RootState) => state.conversation);
 
   useEffect(() => {
     if (conversationId) {
@@ -66,7 +66,6 @@ const ChatPage = () => {
         />
         <div className="h-full overflow-auto p-3">
           <div className="flex flex-col gap-2">
-            {loading && <div className="text-center text-sm text-gray-500">Loading messages...</div>}
             {messages.map((msg) => (
               <ChatMessage key={msg.id} message={msg} isGroup={conversation?.type === 1} />
             ))}

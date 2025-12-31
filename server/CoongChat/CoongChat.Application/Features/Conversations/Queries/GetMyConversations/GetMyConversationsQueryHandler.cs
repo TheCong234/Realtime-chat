@@ -27,6 +27,17 @@ namespace CoongChat.Application.Features.Conversations.Queries.GetMyConversation
                 PageSize = request.PageSize,
                 Search = request.Search
             }, cancellationToken);
+
+            foreach (var conversation in data.Items)
+            {
+                var member = conversation.Members.FirstOrDefault(m => m.UserId == request.CurrentUserId);
+                if (member?.DeletedAt != null && conversation.LastMessage != null && conversation.LastMessage.CreatedAt <= member.DeletedAt)
+                {
+                    conversation.LastMessage = null;
+                    conversation.LastMessageId = null; 
+                }
+            }
+
             return BaseResponse<PagedResult<ConversationDto>>.Ok(new PagedResult<ConversationDto>
             {
                 PageNumber = data.PageNumber,

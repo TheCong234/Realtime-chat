@@ -33,6 +33,17 @@ const conversationSlice = createSlice({
     fetchConversationDetailsFailed(state) {
       state.loading = false;
     },
+
+    // Clear conversation history
+    clearHistory(state, action: PayloadAction<string>) {
+      state.loading = true;
+    },
+    clearHistorySuccess(state) {
+      state.loading = false;
+    },
+    clearHistoryFailed(state) {
+      state.loading = false;
+    },
   },
 });
 
@@ -43,5 +54,8 @@ export const {
   fetchConversationDetails,
   fetchConversationDetailsSuccess,
   fetchConversationDetailsFailed,
+  clearHistory,
+  clearHistorySuccess,
+  clearHistoryFailed,
 } = conversationSlice.actions;
 export default conversationSlice.reducer;
