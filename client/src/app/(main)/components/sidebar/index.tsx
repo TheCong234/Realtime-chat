@@ -27,6 +27,7 @@ import { UserStatus } from "@/constants/enum";
 import Image from "next/image";
 import { useEffect } from "react";
 import { fetchConversations } from "@/features/conversations/conversation.slice";
+import { IMAGE_DOMAIN } from "@/environments";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch();
@@ -47,7 +48,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <Link href="/">
                     <div className="relative h-10 w-10 overflow-hidden rounded-full">
                       <Image
-                        src={currentUser?.avatarUrl || "/assets/images/no-profile-male-icon.png"}
+                        src={
+                          currentUser?.avatarUrl ? IMAGE_DOMAIN + currentUser.avatarUrl : "/assets/images/no-avatar.png"
+                        }
                         alt={currentUser?.fullName || "avatar"}
                         fill
                         className="object-cover"
@@ -140,6 +143,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarMenuItem>
           </SidebarMenu>
         </SidebarHeader>
+
+        {/* all conversations tab  */}
         <SidebarContent className="p-2">
           <TabsContent value="all">
             {loading ? (
@@ -148,14 +153,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               conversations.map((conversation) => {
                 const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
                 const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
-                const avatarUrl = conversation.avatarUrl || partner?.avatarUrl || undefined;
+                const avatarUrl =
+                  conversation.avatarUrl ||
+                  (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "/assets/images/no-avatar.png");
 
                 return (
                   <div key={conversation.id}>
                     <ChatCard
                       name={name}
-                      message={partner?.username || ""}
-                      messageId={conversation.id}
+                      lastMessage={conversation.lastMessage || null}
+                      conversationId={conversation.id}
                       avatarUrl={avatarUrl}
                     />
                   </div>

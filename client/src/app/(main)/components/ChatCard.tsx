@@ -5,43 +5,49 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import StatusDot from "../../../components/StatusDot";
 import Link from "next/link";
 import { ChatCardDropdown } from "./ChatCardDropdown";
-import { cn } from "@/lib/utils";
+import { cn, timeAgo } from "@/lib/utils";
+import { IMessage } from "@/features/messages/message.type";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store";
+import { IMAGE_DOMAIN } from "@/environments";
 
 interface IChatCardProps {
   name: string;
-  message: string;
-  messageId: string;
+  lastMessage: IMessage | null;
+  conversationId: string;
   avatarUrl?: string;
   isGroup?: boolean;
 }
 
-export function ChatCard({
-  messageId,
-  name,
-  message,
-  avatarUrl = "/assets/images/no-avatar.png",
-  isGroup = false,
-}: IChatCardProps) {
+export function ChatCard({ conversationId, name, lastMessage, avatarUrl, isGroup = false }: IChatCardProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-
+  const { user: currentUser } = useSelector((state: RootState) => state.auth);
   return (
     <div className="group/chatcard relative">
       <Link
-        className="hover:bg-accent flex cursor-pointer items-center gap-3 rounded-lg p-2 pr-10"
-        href={`/messenger/${messageId}`}
+        className="hover:bg-accent flex cursor-pointer items-center gap-3 rounded-lg p-1"
+        href={`/messenger/${conversationId}`}
       >
         <div className="relative">
           <Avatar className="h-14 w-14 border border-gray-200">
             <AvatarImage src={avatarUrl} alt={name} />
           </Avatar>
-          <span className="absolute right-1 bottom-1">
-            <StatusDot />
+          <span className="absolute right-0 bottom-0">
+            <StatusDot className="size-3" />
           </span>
         </div>
 
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate font-medium">{name}</span>
-          <span className="text-muted-foreground truncate text-sm">{message}</span>
+        <div className="w-full">
+          <p className="truncate font-medium">{name}</p>
+          <div className="flex items-center justify-between">
+            <span className="text-muted-foreground truncate text-xs">
+              {lastMessage?.senderId === currentUser?.id
+                ? "Bạn: "
+                : lastMessage?.sender?.fullName || lastMessage?.sender?.username}
+              {lastMessage?.content}
+            </span>
+            <span className="text-muted-foreground truncate text-xs">{timeAgo(lastMessage?.createdAt || "")}</span>
+          </div>
         </div>
       </Link>
 

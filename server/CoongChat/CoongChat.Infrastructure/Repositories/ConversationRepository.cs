@@ -32,6 +32,8 @@ namespace CoongChat.Infrastructure.Repositories
             var query = _context.Conversations
                 .Include(c => c.Members)
                     .ThenInclude(m => m.User)
+                 .Include(c => c.LastMessage)
+                    .ThenInclude(m => m.Sender)
                 .Where(c => c.Members.Any(m => m.UserId == userId))
                 .AsNoTracking();
             var totalCount = await query.CountAsync(cancellationToken);
@@ -63,6 +65,12 @@ namespace CoongChat.Infrastructure.Repositories
                     .ThenInclude(m => m.User)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == conversationId, cancellationToken);
+        }
+
+        public async Task UpdateAsync(Conversation conversation, CancellationToken cancellationToken)
+        {
+            _context.Conversations.Update(conversation);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

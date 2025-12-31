@@ -9,5 +9,6 @@ namespace CoongChat.Application.Interfaces
         Task AddAsync(Conversation conversation, CancellationToken cancellationToken);
         Task<Conversation?> GetByConversationByIdAsync(Guid conversationId, CancellationToken cancellationToken);
         Task<PagedResult<Conversation>> GetUserConversationsAsync(Guid userId, BaseFilter filter, CancellationToken cancellationToken);
+        Task UpdateAsync(Conversation conversation, CancellationToken cancellationToken);
     }
 }

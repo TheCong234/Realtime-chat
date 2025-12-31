@@ -14,13 +14,14 @@ import {
 import { IAuthResponse } from "./auth.types";
 import { IUser } from "../user/user.types";
 import { toast } from "sonner";
+import { IBaseResponse } from "@/types/api-response";
 
 function* handleLogin(action: ReturnType<typeof loginRequest>) {
   try {
-    const response: IAuthResponse = yield call(authService.login, action.payload);
+    const response: IBaseResponse<IAuthResponse> = yield call(authService.login, action.payload);
 
     // lưu token (demo)
-    localStorage.setItem("accessToken", response.accessToken);
+    localStorage.setItem("accessToken", response.data.accessToken);
 
     yield put(loginSuccess());
     toast.success("Đăng nhập thành công");
@@ -32,10 +33,10 @@ function* handleLogin(action: ReturnType<typeof loginRequest>) {
 
 function* handleRegister(action: ReturnType<typeof registerRequest>) {
   try {
-    const response: IAuthResponse = yield call(authService.register, action.payload);
+    const response: IBaseResponse<IAuthResponse> = yield call(authService.register, action.payload);
 
     // lưu token (demo)
-    localStorage.setItem("accessToken", response.accessToken);
+    localStorage.setItem("accessToken", response.data.accessToken);
 
     yield put(registerSuccess());
     toast.success("Đăng ký thành công");
@@ -47,8 +48,8 @@ function* handleRegister(action: ReturnType<typeof registerRequest>) {
 
 function* handleGetMe(action: ReturnType<typeof getMeRequest>) {
   try {
-    const response: IUser = yield call(authService.getMe, action.payload);
-    yield put(getMeSuccess(response));
+    const response: IBaseResponse<IUser> = yield call(authService.getMe, action.payload);
+    yield put(getMeSuccess(response.data));
   } catch (error: any) {
     yield put(getMeFailure(error.message));
   }

@@ -14,6 +14,8 @@ namespace CoongChat.Domain.Entities
 
         public ICollection<ConversationMember> Members { get; set; }
         public ICollection<Message> Messages { get; set; }
+        public Guid? LastMessageId { get; set; }
+        public Message? LastMessage { get; set; }
     }
 
 }

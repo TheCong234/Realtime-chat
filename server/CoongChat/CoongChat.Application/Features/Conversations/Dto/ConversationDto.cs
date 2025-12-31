@@ -1,3 +1,4 @@
+using CoongChat.Application.Features.Messages.Dto;
 using CoongChat.Domain.Common;
 
 namespace CoongChat.Application.Features.Conversations.Dto
@@ -10,6 +11,7 @@ namespace CoongChat.Application.Features.Conversations.Dto
         public string? AvatarUrl { get; set; }
         public DateTime CreatedAt { get; set; }
         public ICollection<ConversationMemberDto> Members { get; set; }
+        public MessageDto? LastMessage { get; set; }
     }
 
     public class ConversationMemberDto

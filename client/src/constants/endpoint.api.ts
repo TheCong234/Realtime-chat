@@ -15,3 +15,7 @@ export const MESSAGE_API = {
   GET_BY_CONVERSATION_ID: `${apiVersion}/Message/Conversation`,
   SEND: `${apiVersion}/Message`,
 };
+
+export const USER_API = {
+  UPDATE_PROFILE: `${apiVersion}/Users/Profile`,
+};

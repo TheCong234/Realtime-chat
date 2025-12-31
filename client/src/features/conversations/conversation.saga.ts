@@ -10,12 +10,13 @@ import {
   fetchConversationDetailsSuccess,
   fetchConversationDetailsFailed,
 } from "./conversation.slice";
-import { IPagedResult } from "@/types/api-response";
+import { IBaseResponse, IPagedResult } from "@/types/api-response";
 
 function* fetchConversationsSaga() {
   try {
-    const response: IPagedResult<IConversation> = yield call(conversationService.getConversations);
-    yield put(fetchConversationsSuccess(response.items));
+    const response: IBaseResponse<IPagedResult<IConversation>> = yield call(conversationService.getConversations);
+
+    yield put(fetchConversationsSuccess(response.data.items));
   } catch (error) {
     console.log("Failed to fetch conversations", error);
     yield put(fetchConversationsFailed());
@@ -25,8 +26,8 @@ function* fetchConversationsSaga() {
 function* fetchConversationDetailsSaga(action: PayloadAction<string>) {
   try {
     const conversationId = action.payload;
-    const response: IConversation = yield call(conversationService.getConversationById, conversationId);
-    yield put(fetchConversationDetailsSuccess(response));
+    const response: IBaseResponse<IConversation> = yield call(conversationService.getConversationById, conversationId);
+    yield put(fetchConversationDetailsSuccess(response.data));
   } catch (error) {
     console.log("Failed to fetch conversation details", error);
     yield put(fetchConversationDetailsFailed());
