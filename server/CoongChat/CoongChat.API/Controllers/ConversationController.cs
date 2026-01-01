@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using CoongChat.Application.Features.Conversations.Commands.ClearHistory;
 using CoongChat.Application.Features.Conversations.Commands.CreatePrivateConversation;
 using CoongChat.Application.Features.Conversations.Queries.GetConversationDetails;
 using CoongChat.Application.Features.Conversations.Queries.GetMyConversations;
@@ -63,6 +64,20 @@ namespace CoongChat.API.Controllers
             };
 
             var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpPost("{id}/ClearHistory")]
+        public async Task<IActionResult> ClearHistory(Guid id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+
+            var command = new ClearHistoryCommand(id, Guid.Parse(userIdClaim));
+            var result = await _mediator.Send(command);
             return Ok(result);
         }
 

@@ -39,13 +39,18 @@ namespace CoongChat.API.Controllers
         }
 
         [HttpGet("Conversation/{id}/GetPaged")]
-        public async Task<IActionResult> GetMessagesByConversationId(Guid id, [FromQuery] GetMessagesByConversationIdQuery query)
+        public async Task<IActionResult> GetMessagesByConversationId(Guid id)
         {
-            if (id != query.ConversationId)
+            if (id == Guid.Empty)
             {
-                query.ConversationId = id;
+                return BadRequest("Id không hợp lệ");
             }
-
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+            var query = new GetMessagesByConversationIdQuery(id, Guid.Parse(userIdClaim));
             var result = await _mediator.Send(query);
             return Ok(result);
         }

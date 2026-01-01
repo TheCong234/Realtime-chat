@@ -18,4 +18,15 @@ export const conversationService = {
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
   },
+
+  clearHistory: async (id: string): Promise<IBaseResponse<null>> => {
+    const url = CONVERSATION_API.CLEAR_HISTORY(id);
+    return axiosClient.post(
+      url,
+      {},
+      {
+        headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+      },
+    );
+  },
 };

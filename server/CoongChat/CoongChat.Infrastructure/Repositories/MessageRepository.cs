@@ -21,12 +21,19 @@ namespace CoongChat.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<PagedResult<Message>> GetPagedMessagesAsync(Guid conversationId, int pageNumber, int pageSize, CancellationToken cancellationToken)
+        public async Task<PagedResult<Message>> GetPagedMessagesAsync(Guid conversationId, int pageNumber, int pageSize, DateTime? fromDate, CancellationToken cancellationToken)
         {
             var query = _context.Messages
                 .Include(m => m.Sender)
                 .Where(m => m.ConversationId == conversationId)
-                .OrderByDescending(m => m.CreatedAt);
+                .AsQueryable();
+
+            if (fromDate.HasValue)
+            {
+                query = query.Where(m => m.CreatedAt > fromDate.Value);
+            }
+
+            query = query.OrderByDescending(m => m.CreatedAt);
 
             var totalCount = await query.CountAsync(cancellationToken);
             var items = await query

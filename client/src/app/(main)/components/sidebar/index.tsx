@@ -32,7 +32,7 @@ import { IMAGE_DOMAIN } from "@/environments";
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch();
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
-  const { conversations, loading } = useSelector((state: RootState) => state.conversation);
+  const { conversations } = useSelector((state: RootState) => state.conversation);
 
   useEffect(() => {
     dispatch(fetchConversations());
@@ -147,28 +147,24 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {/* all conversations tab  */}
         <SidebarContent className="p-2">
           <TabsContent value="all">
-            {loading ? (
-              <div className="p-4 text-center text-sm text-gray-500">Loading...</div>
-            ) : (
-              conversations.map((conversation) => {
-                const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
-                const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
-                const avatarUrl =
-                  conversation.avatarUrl ||
-                  (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "/assets/images/no-avatar.png");
+            {conversations.map((conversation) => {
+              const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
+              const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
+              const avatarUrl =
+                conversation.avatarUrl ||
+                (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "/assets/images/no-avatar.png");
 
-                return (
-                  <div key={conversation.id}>
-                    <ChatCard
-                      name={name}
-                      lastMessage={conversation.lastMessage || null}
-                      conversationId={conversation.id}
-                      avatarUrl={avatarUrl}
-                    />
-                  </div>
-                );
-              })
-            )}
+              return (
+                <div key={conversation.id}>
+                  <ChatCard
+                    name={name}
+                    lastMessage={conversation.lastMessage || null}
+                    conversationId={conversation.id}
+                    avatarUrl={avatarUrl}
+                  />
+                </div>
+              );
+            })}
           </TabsContent>
           <TabsContent value="unread">
             <div>unread tab content</div>
