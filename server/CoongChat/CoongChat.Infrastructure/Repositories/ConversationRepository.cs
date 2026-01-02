@@ -34,11 +34,25 @@ namespace CoongChat.Infrastructure.Repositories
                     .ThenInclude(m => m.User)
                 .Include(c => c.LastMessage)
                     .ThenInclude(m => m.Sender)
-                .Where(c => c.Members.Any(m => 
-                    m.UserId == userId && 
+                .Where(c => c.Members.Any(m =>
+                    m.UserId == userId &&
                     (m.DeletedAt == null || (c.LastMessage != null && c.LastMessage.CreatedAt > m.DeletedAt))
                 ))
                 .AsNoTracking();
+
+            if (!string.IsNullOrWhiteSpace(filter.Search))
+            {
+                var search = filter.Search.Trim().ToLower();
+
+                query = query.Where(c => c.Members.Any(m =>
+                    m.UserId != userId && (
+                        m.User.Username.ToLower().Contains(search) ||
+                        m.User.FullName.ToLower().Contains(search) ||
+                        m.User.PhoneNumber.Contains(search)
+                    )
+                ));
+            }
+
             var totalCount = await query.CountAsync(cancellationToken);
 
             var items = await query

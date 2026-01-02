@@ -2,14 +2,16 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import StatusDot from "../../../components/StatusDot";
 import Link from "next/link";
 import { ChatCardDropdown } from "./ChatCardDropdown";
-import { cn, timeAgo } from "@/lib/utils";
+import { cn, getUserInitials, timeAgo } from "@/lib/utils";
 import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
+import { IUser } from "@/features/user/user.types";
+import { UserStatus } from "@/constants/enum";
 
 interface IChatCardProps {
   name: string;
@@ -17,9 +19,17 @@ interface IChatCardProps {
   conversationId: string;
   avatarUrl?: string;
   isGroup?: boolean;
+  userStatus: UserStatus | UserStatus.Offline;
 }
 
-export function ChatCard({ conversationId, name, lastMessage, avatarUrl, isGroup = false }: IChatCardProps) {
+export function ChatCard({
+  conversationId,
+  name,
+  lastMessage,
+  avatarUrl,
+  isGroup = false,
+  userStatus,
+}: IChatCardProps) {
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
@@ -39,9 +49,10 @@ export function ChatCard({ conversationId, name, lastMessage, avatarUrl, isGroup
         <div className="relative">
           <Avatar className="h-14 w-14 border border-gray-200">
             <AvatarImage src={avatarUrl} alt={name} />
+            <AvatarFallback>{getUserInitials({ fullName: "", username: name })}</AvatarFallback>
           </Avatar>
           <span className="absolute right-0 bottom-0">
-            <StatusDot className="size-3" />
+            <StatusDot className="size-3" status={userStatus} showPulse={false} />
           </span>
         </div>
 

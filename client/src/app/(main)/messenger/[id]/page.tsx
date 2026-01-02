@@ -12,6 +12,7 @@ import { useParams } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { UserStatus } from "@/constants/enum";
+import { IMAGE_DOMAIN } from "@/environments";
 
 const ChatPage = () => {
   const [showInfo, setShowInfo] = useState(false);
@@ -34,27 +35,29 @@ const ChatPage = () => {
     if (!conversation) {
       return {
         name: "Loading...",
-        avatar: "/assets/images/no-avatar.png",
-        status: "",
+        avatar: undefined,
+        status: UserStatus.Offline,
       };
     }
 
     if (conversation.type === 0) {
       const otherMember = conversation.members.find((member) => member.userId !== currentUser?.id);
+      console.log("other menber", otherMember);
+
       return {
         name: otherMember?.fullName || otherMember?.username || "Unknown",
-        avatar: otherMember?.avatarUrl || "/assets/images/no-avatar.png",
-        status: UserStatus[otherMember?.status || UserStatus.Offline],
+        avatar: conversation.avatarUrl || (otherMember?.avatarUrl && IMAGE_DOMAIN + otherMember.avatarUrl) || undefined,
+        status: otherMember?.userStatus || UserStatus.Offline,
       };
     }
 
     return {
       name: conversation.name || "Group Chat",
-      avatar: conversation.avatarUrl || "/assets/images/no-avatar.png",
-      status: `${conversation.members.length} thành viên`,
+      avatar: conversation.avatarUrl || (conversation.avatarUrl && IMAGE_DOMAIN + conversation.avatarUrl) || undefined,
+      status: UserStatus.Online,
     };
   }, [conversation, currentUser?.id]);
-
+  console.log(toolbarInfo);
   return (
     <div className="flex h-full gap-4">
       <div className="flex h-full flex-1 flex-col justify-between rounded-xl bg-white shadow-xl">

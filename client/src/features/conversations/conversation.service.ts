@@ -2,12 +2,18 @@ import { axiosClient } from "@/lib/axios";
 import { IBaseResponse, IPagedResult } from "@/types/api-response";
 import { IConversation } from "./conversation.type";
 import { CONVERSATION_API } from "@/constants/endpoint.api";
+import { buildQueryParams, createSearchParams } from "@/lib/query.utils";
 
 export const conversationService = {
-  getConversations: async (): Promise<IBaseResponse<IPagedResult<IConversation>>> => {
+  getConversations: async (searchQuery?: string): Promise<IBaseResponse<IPagedResult<IConversation>>> => {
     const url = CONVERSATION_API.GET_PAGED;
+    const params = buildQueryParams({
+      values: "all",
+      ...createSearchParams(searchQuery),
+    });
+
     return axiosClient.get(url, {
-      params: { values: "all" },
+      params,
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
   },

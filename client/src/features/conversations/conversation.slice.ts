@@ -5,14 +5,16 @@ const initialState: IConversationState = {
   conversations: [],
   conversation: null,
   loading: false,
+  searchQuery: "",
 };
 
 const conversationSlice = createSlice({
   name: "conversation",
   initialState,
   reducers: {
-    fetchConversations(state) {
+    fetchConversations(state, action: PayloadAction<string | undefined>) {
       state.loading = true;
+      state.searchQuery = action.payload || "";
     },
     fetchConversationsSuccess(state, action: PayloadAction<IConversation[]>) {
       state.loading = false;

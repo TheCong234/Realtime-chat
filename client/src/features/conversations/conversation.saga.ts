@@ -16,9 +16,13 @@ import {
 import { IBaseResponse, IPagedResult } from "@/types/api-response";
 import { toast } from "sonner";
 
-function* fetchConversationsSaga() {
+function* fetchConversationsSaga(action: PayloadAction<string | undefined>) {
   try {
-    const response: IBaseResponse<IPagedResult<IConversation>> = yield call(conversationService.getConversations);
+    const searchQuery = action.payload;
+    const response: IBaseResponse<IPagedResult<IConversation>> = yield call(
+      conversationService.getConversations,
+      searchQuery,
+    );
 
     yield put(fetchConversationsSuccess(response.data.items));
   } catch (error) {

@@ -7,7 +7,7 @@ export interface IMember {
   fullName: string | null;
   avatarUrl: string | null;
   role: number;
-  status: UserStatus;
+  userStatus: UserStatus;
 }
 
 export interface IConversation {
@@ -24,4 +24,5 @@ export interface IConversationState {
   conversations: IConversation[];
   conversation: IConversation | null;
   loading: boolean;
+  searchQuery: string;
 }

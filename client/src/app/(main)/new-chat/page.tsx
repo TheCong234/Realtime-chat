@@ -1,6 +1,6 @@
 "use client";
 import Footer from "../components/Footer";
-import { ReceipientsAutocomplete } from "@/components/ReceipientsAutocomplete";
+import { ReceipientsAutocomplete } from "@/app/(main)/new-chat/ReceipientsAutocomplete";
 import { useState } from "react";
 import { IUser } from "@/features/user/user.types";
 import { messageService } from "@/features/messages/message.service";
@@ -9,7 +9,6 @@ import { Loader2 } from "lucide-react";
 
 const NewChatPage = () => {
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
-  const [messageContent, setMessageContent] = useState("");
   const [isSending, setIsSending] = useState(false);
 
   const handleSendMessage = async (content: string) => {
@@ -27,13 +26,12 @@ const NewChatPage = () => {
     try {
       await messageService.broadcastMessage({
         userIds: selectedUsers.map((u) => u.id),
-        type: 0, // Text message
+        type: 0,
         content: content.trim(),
       });
       toast.success(`Đã gửi tin nhắn đến ${selectedUsers.length} người nhận`);
-      setMessageContent("");
-      // Optionally clear recipients after successful send
-      // setSelectedUsers([]);
+
+      setSelectedUsers([]);
     } catch (error: any) {
       toast.error(error.message || "Không thể gửi tin nhắn");
     } finally {
