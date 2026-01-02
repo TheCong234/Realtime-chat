@@ -1,9 +1,23 @@
 import { axiosClient } from "@/lib/axios";
 import { IUser } from "./user.types";
-import { IBaseResponse } from "@/types/api-response";
+import { IBaseResponse, IUserPagedResult } from "@/types/api-response";
 import { USER_API } from "@/constants/endpoint.api";
 
 export const userService = {
+  getPagedUsers: async (
+    pageNumber: number,
+    pageSize: number,
+    searchQuery?: string,
+  ): Promise<IBaseResponse<IUserPagedResult>> => {
+    return axiosClient.get(USER_API.GET_PAGED, {
+      params: {
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        ...(searchQuery && { SearchQuery: searchQuery }),
+      },
+      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+    });
+  },
   updateProfile: async (data: FormData, avatarFile: File | null): Promise<IBaseResponse<IUser>> => {
     const formData = new FormData();
     if (data.get("fullName")) formData.append("fullName", data.get("fullName") as string);

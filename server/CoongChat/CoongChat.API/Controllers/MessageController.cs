@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using CoongChat.Application.Features.Messages.Commands.SendMessage;
+using CoongChat.Application.Features.Messages.Commands.SendMessageToMultipleUsers;
 using CoongChat.Application.Features.Messages.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +22,25 @@ namespace CoongChat.API.Controllers
 
         [HttpPost]
         public async Task<IActionResult> SendMessage([FromBody] SendMessageCommand command)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+
+            command.CurrentUserId = Guid.Parse(userIdClaim);
+            var result = await _mediator.Send(command);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost("Broadcast")]
+        public async Task<IActionResult> SendMessageToMultipleUsers([FromBody] SendMessageToMultipleUsersCommand command)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userIdClaim))

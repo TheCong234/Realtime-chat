@@ -7,7 +7,11 @@ import { useDispatch } from "react-redux";
 import { useParams } from "next/navigation";
 import { sendMessage } from "@/features/messages/message.slice";
 
-const Footer = () => {
+interface IFooterProps {
+  onSendMessage?: (content: string) => void | Promise<void>;
+}
+
+const Footer = ({ onSendMessage }: IFooterProps) => {
   const [content, setContent] = useState("");
   const dispatch = useDispatch();
   const params = useParams();
@@ -15,14 +19,21 @@ const Footer = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && content.trim()) {
-      dispatch(
-        sendMessage({
-          conversationId,
-          type: 0, // Text message
-          content: content.trim(),
-        }),
-      );
-      setContent("");
+      // If onSendMessage prop is provided (broadcast mode), use it
+      if (onSendMessage) {
+        onSendMessage(content.trim());
+        setContent("");
+      } else {
+        // Otherwise use the conversation mode (existing behavior)
+        dispatch(
+          sendMessage({
+            conversationId,
+            type: 0, // Text message
+            content: content.trim(),
+          }),
+        );
+        setContent("");
+      }
     }
   };
 

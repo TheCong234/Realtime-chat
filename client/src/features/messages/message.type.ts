@@ -31,3 +31,9 @@ export interface ISendMessagePayload {
   type: number;
   content: string;
 }
+
+export interface IBroadcastMessagePayload {
+  userIds: string[];
+  type: number;
+  content: string;
+}

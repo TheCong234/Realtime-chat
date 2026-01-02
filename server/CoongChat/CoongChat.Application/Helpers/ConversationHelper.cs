@@ -1,4 +1,4 @@
-using CoongChat.Application.Features.Messages.Commands.SendMessage;
+using CoongChat.Application.Features.Messages.Commands.SendMessageToMultipleUsers;
 using CoongChat.Domain.Common;
 using CoongChat.Domain.Entities;
 
@@ -6,7 +6,7 @@ namespace CoongChat.Application.Helpers
 {
     public class ConversationHelper
     {
-        public static Conversation CreateNewPrivateConversation(SendMessageCommand request)
+        public static Conversation CreateNewPrivateConversation(SendMessageWithoutConversationCommand request)
         {
             return new Conversation
             {

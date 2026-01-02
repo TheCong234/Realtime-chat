@@ -10,6 +10,7 @@ namespace CoongChat.Application.Interfaces
         Task<User?> GetByUsernameOrEmailAsync(string usernameOrEmail);
         Task<PagedResult<User>> GetPagedAsync(GetUsersFilter filter, CancellationToken cancellationToken);
         Task<Boolean> ExistsAsync(string username, string email);
+        Task<bool> AllExistAsync(List<Guid> userIds, CancellationToken cancellationToken);
 
         Task AddAsync(User user);
         Task UpdateAsync(User user);

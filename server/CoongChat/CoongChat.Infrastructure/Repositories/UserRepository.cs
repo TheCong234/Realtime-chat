@@ -105,5 +105,13 @@ namespace CoongChat.Infrastructure.Repositories
             _context.Users.Remove(user);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> AllExistAsync(List<Guid> userIds, CancellationToken cancellationToken)
+        {
+            var count = await _context.Users
+                .Where(u => userIds.Contains(u.Id))
+                .CountAsync(cancellationToken);
+            return count == userIds.Count;
+        }
     }
 }
