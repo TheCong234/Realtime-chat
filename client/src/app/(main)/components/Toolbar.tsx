@@ -1,24 +1,29 @@
 import { IconButtonTooltip } from "@/components/IconButtonTooltip";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserStatus } from "@/constants/enum";
+import { getUserInitials } from "@/lib/utils";
 import { InfoIcon, PhoneIcon, VideoIcon } from "lucide-react";
 import React from "react";
 
 interface IToolbarProps {
   name: string;
-  avatar: string;
-  status: string;
+  avatar: string | undefined;
+  status: UserStatus;
   setShowInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
 const Toolbar = React.memo(({ name, avatar, status, setShowInfo }: IToolbarProps) => {
+  console.log("Usersattau", status);
+
   return (
     <div className="border-border flex items-center justify-between border-b p-3">
       <div className="flex items-center gap-3">
         <Avatar className="h-12 w-12 border border-gray-200">
           <AvatarImage src={avatar} alt="avatar" />
+          <AvatarFallback>{getUserInitials({ fullName: name, username: name })}</AvatarFallback>
         </Avatar>
         <div className="flex flex-col">
           <p className="text-lg font-medium">{name}</p>
-          <p className="mt-[-4px] text-sm text-gray-500">{status}</p>
+          <p className="mt-[-4px] text-sm text-gray-500">{UserStatus[status]}</p>
         </div>
       </div>
 

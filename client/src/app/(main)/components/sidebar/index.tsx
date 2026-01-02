@@ -28,15 +28,28 @@ import Image from "next/image";
 import { useEffect } from "react";
 import { fetchConversations } from "@/features/conversations/conversation.slice";
 import { IMAGE_DOMAIN } from "@/environments";
+import { getUserInitials } from "@/lib/utils";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch();
   const { user: currentUser } = useSelector((state: RootState) => state.auth);
   const { conversations } = useSelector((state: RootState) => state.conversation);
+  const [searchQuery, setSearchQuery] = React.useState("");
 
+  // Initial fetch without search
   useEffect(() => {
     dispatch(fetchConversations());
   }, [dispatch]);
+
+  // Debounced search effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      dispatch(fetchConversations(searchQuery));
+    }, 500); // 500ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, dispatch]);
   return (
     <Sidebar {...props}>
       <Tabs defaultValue="all">
@@ -46,15 +59,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div className="flex">
                 <SidebarMenuButton size="lg" asChild>
                   <Link href="/">
-                    <div className="relative h-10 w-10 overflow-hidden rounded-full">
-                      <Image
-                        src={
-                          currentUser?.avatarUrl ? IMAGE_DOMAIN + currentUser.avatarUrl : "/assets/images/no-avatar.png"
-                        }
-                        alt={currentUser?.fullName || "avatar"}
-                        fill
-                        className="object-cover"
-                      />
+                    <div className="relative overflow-hidden">
+                      <Avatar className="h-10 w-10 border border-gray-200">
+                        <AvatarImage
+                          src={(currentUser?.avatarUrl && IMAGE_DOMAIN + currentUser.avatarUrl) || undefined}
+                          alt="avatar"
+                        />
+                        <AvatarFallback>
+                          {getUserInitials({ fullName: currentUser?.fullName, username: currentUser?.username || "" })}
+                        </AvatarFallback>
+                      </Avatar>
                     </div>
                     <div className="flex flex-col gap-0.5 leading-none">
                       <span className="text-base font-medium">{currentUser?.fullName || currentUser?.username}</span>
@@ -113,7 +127,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {/* search */}
             <SidebarMenuItem className="mt-3">
               <div className="flex w-full max-w-sm items-center space-x-2">
-                <Input type="search" placeholder="Search..." className="flex-1" />
+                <Input
+                  type="search"
+                  placeholder="Search..."
+                  className="flex-1"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
@@ -150,9 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             {conversations.map((conversation) => {
               const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
               const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
-              const avatarUrl =
-                conversation.avatarUrl ||
-                (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "/assets/images/no-avatar.png");
+              const avatarUrl = conversation.avatarUrl || (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "");
 
               return (
                 <div key={conversation.id}>
@@ -161,6 +179,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                     lastMessage={conversation.lastMessage || null}
                     conversationId={conversation.id}
                     avatarUrl={avatarUrl}
+                    userStatus={partner?.userStatus || UserStatus.Offline}
                   />
                 </div>
               );

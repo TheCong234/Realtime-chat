@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { X, ChevronsUpDown, Check, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, getUserInitials } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
@@ -73,18 +73,6 @@ export function ReceipientsAutocomplete({
 
   const remove = (userId: string) => onChange(values.filter((v) => v.id !== userId));
 
-  const getUserInitials = (user: IUser) => {
-    if (user.fullName) {
-      return user.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2);
-    }
-    return user.username.slice(0, 2).toUpperCase();
-  };
-
   return (
     <div className={cn("space-y-2", className)}>
       <Popover open={open} onOpenChange={setOpen}>
@@ -140,7 +128,9 @@ export function ReceipientsAutocomplete({
                         <Check className={cn("h-4 w-4 opacity-0")} />
                         <Avatar className="h-8 w-8">
                           <AvatarImage src={user.avatarUrl || undefined} alt={user.username} />
-                          <AvatarFallback>{getUserInitials(user)}</AvatarFallback>
+                          <AvatarFallback>
+                            {getUserInitials({ fullName: user?.fullName, username: user.username })}
+                          </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
                           <span className="font-medium">{user.fullName || user.username}</span>

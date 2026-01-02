@@ -1,3 +1,4 @@
+import { IUser } from "@/features/user/user.types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -30,3 +31,20 @@ export function timeAgo(dateInput: string | Date): string {
 
   return "Vừa xong";
 }
+
+//user
+interface IUserInitials {
+  fullName: string | null | undefined;
+  username: string;
+}
+export const getUserInitials = ({ fullName, username }: IUserInitials) => {
+  if (fullName) {
+    return fullName
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  }
+  return username.slice(0, 2).toUpperCase();
+};

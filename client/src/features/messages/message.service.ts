@@ -2,15 +2,19 @@ import { axiosClient } from "@/lib/axios";
 import { IMessage, ISendMessagePayload, IBroadcastMessagePayload } from "./message.type";
 import { MESSAGE_API } from "@/constants/endpoint.api";
 import { IBaseResponse, IMessagePagedResult } from "@/types/api-response";
+import { buildQueryParams, createPaginationParams } from "@/lib/query.utils";
 
 export const messageService = {
-  getMessages: async (conversationId: string): Promise<IBaseResponse<IMessagePagedResult>> => {
+  getMessages: async (
+    conversationId: string,
+    pageNumber = 1,
+    pageSize = 10,
+  ): Promise<IBaseResponse<IMessagePagedResult>> => {
     const url = `${MESSAGE_API.GET_BY_CONVERSATION_ID}/${conversationId}/GetPaged`;
+    const params = buildQueryParams(createPaginationParams(pageNumber, pageSize));
+
     return axiosClient.get(url, {
-      params: {
-        pageNumber: 1,
-        pageSize: 10,
-      },
+      params,
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
   },

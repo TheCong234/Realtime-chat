@@ -2,6 +2,7 @@ import { axiosClient } from "@/lib/axios";
 import { IUser } from "./user.types";
 import { IBaseResponse, IUserPagedResult } from "@/types/api-response";
 import { USER_API } from "@/constants/endpoint.api";
+import { buildQueryParams } from "@/lib/query.utils";
 
 export const userService = {
   getPagedUsers: async (
@@ -9,12 +10,15 @@ export const userService = {
     pageSize: number,
     searchQuery?: string,
   ): Promise<IBaseResponse<IUserPagedResult>> => {
+    // Note: Backend API expects PascalCase params
+    const params = buildQueryParams({
+      PageNumber: pageNumber,
+      PageSize: pageSize,
+      ...(searchQuery && { Search: searchQuery }),
+    });
+
     return axiosClient.get(USER_API.GET_PAGED, {
-      params: {
-        PageNumber: pageNumber,
-        PageSize: pageSize,
-        ...(searchQuery && { SearchQuery: searchQuery }),
-      },
+      params,
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
   },
