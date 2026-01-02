@@ -1,4 +1,5 @@
 import { IMessage } from "@/features/messages/message.type";
+import { IUser } from "@/features/user/user.types";
 
 export interface IBaseResponse<T> {
   success: boolean;
@@ -14,3 +15,4 @@ export interface IPagedResult<T> {
 }
 
 export type IMessagePagedResult = IPagedResult<IMessage>;
+export type IUserPagedResult = IPagedResult<IUser>;

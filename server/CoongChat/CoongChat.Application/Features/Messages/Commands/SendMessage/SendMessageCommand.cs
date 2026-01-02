@@ -9,7 +9,6 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
     {
         public Guid ConversationId { get; set; }
         public Guid CurrentUserId { get; set; }
-        public Guid TargetUserId { get; set; }
         public MessageType Type { get; set; }
         public string Content { get; set; }
     }

@@ -105,6 +105,7 @@ namespace CoongChat.API
             builder.Services.AddScoped<IConversationRepository, ConversationRepository>();
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
             builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
+            builder.Services.AddScoped<IDatabaseService, DatabaseService>();
             #endregion
 
             #region  REGISTER MEDIATR  - VALIDATORS

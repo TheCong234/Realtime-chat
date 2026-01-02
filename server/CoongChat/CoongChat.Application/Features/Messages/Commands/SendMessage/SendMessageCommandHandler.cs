@@ -1,7 +1,6 @@
 using AutoMapper;
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Features.Messages.Dto;
-using CoongChat.Application.Helpers;
 using CoongChat.Application.Interfaces;
 using CoongChat.Domain.Entities;
 using MediatR;
@@ -29,23 +28,13 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
      SendMessageCommand request,
      CancellationToken cancellationToken)
         {
-            if (request.CurrentUserId == request.TargetUserId)
-            {
-                throw new Exception("Không thể nhắn tin cho chính mình.");
-            }
 
             var conversation = await _conversationRepository
                 .GetByConversationByIdAsync(request.ConversationId, cancellationToken);
 
             if (conversation == null)
             {
-                conversation = await _conversationRepository.GetPrivateConversationAsync(
-                        request.CurrentUserId, request.TargetUserId, cancellationToken);
-                if (conversation == null)
-                {
-                    conversation = ConversationHelper.CreateNewPrivateConversation(request);
-                    await _conversationRepository.AddAsync(conversation, cancellationToken);
-                }
+                throw new Exception("Cuộc hội thoại không tồn tại.");
 
             }
             else if (!conversation.Members.Any(m => m.UserId == request.CurrentUserId))

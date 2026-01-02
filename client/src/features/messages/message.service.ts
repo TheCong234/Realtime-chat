@@ -1,5 +1,5 @@
 import { axiosClient } from "@/lib/axios";
-import { IMessage, ISendMessagePayload } from "./message.type";
+import { IMessage, ISendMessagePayload, IBroadcastMessagePayload } from "./message.type";
 import { MESSAGE_API } from "@/constants/endpoint.api";
 import { IBaseResponse, IMessagePagedResult } from "@/types/api-response";
 
@@ -16,6 +16,12 @@ export const messageService = {
   },
   sendMessage: async (payload: ISendMessagePayload): Promise<IBaseResponse<IMessage>> => {
     const url = MESSAGE_API.SEND;
+    return axiosClient.post(url, payload, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+    });
+  },
+  broadcastMessage: async (payload: IBroadcastMessagePayload): Promise<IBaseResponse<void>> => {
+    const url = MESSAGE_API.BROADCAST;
     return axiosClient.post(url, payload, {
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
