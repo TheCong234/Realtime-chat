@@ -4,13 +4,19 @@ import { IMessage, ISendMessagePayload } from "./message.type";
 interface IMessageState {
   messages: IMessage[];
   loading: boolean;
+  loadingMore: boolean;
   error: string | null;
+  hasMore: boolean;
+  pageNumber: number;
 }
 
 const initialState: IMessageState = {
   messages: [],
   loading: false,
+  loadingMore: false,
   error: null,
+  hasMore: true,
+  pageNumber: 1,
 };
 
 const messageSlice = createSlice({
@@ -21,9 +27,11 @@ const messageSlice = createSlice({
       state.loading = true;
       state.error = null;
     },
-    fetchMessagesSuccess(state, action: PayloadAction<IMessage[]>) {
+    fetchMessagesSuccess(state, action: PayloadAction<{ messages: IMessage[]; hasMore: boolean }>) {
       state.loading = false;
-      state.messages = action.payload.reverse();
+      state.messages = action.payload.messages.reverse();
+      state.hasMore = action.payload.hasMore;
+      state.pageNumber = 1;
     },
     fetchMessagesFailed(state, action: PayloadAction<string>) {
       state.loading = false;
@@ -32,6 +40,8 @@ const messageSlice = createSlice({
     resetMessages(state) {
       state.messages = [];
       state.error = null;
+      state.hasMore = true;
+      state.pageNumber = 1;
     },
 
     // Send Message Actions
@@ -47,6 +57,23 @@ const messageSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     },
+
+    // Load More Messages Actions
+    loadMoreMessages(state, _action: PayloadAction<string>) {
+      state.loadingMore = true;
+      state.error = null;
+    },
+    loadMoreMessagesSuccess(state, action: PayloadAction<{ messages: IMessage[]; hasMore: boolean }>) {
+      state.loadingMore = false;
+      // Prepend older messages to the beginning
+      state.messages = action.payload.messages.reverse().concat(state.messages);
+      state.hasMore = action.payload.hasMore;
+      state.pageNumber += 1;
+    },
+    loadMoreMessagesFailed(state, action: PayloadAction<string>) {
+      state.loadingMore = false;
+      state.error = action.payload;
+    },
   },
 });
 
@@ -58,5 +85,8 @@ export const {
   sendMessage,
   sendMessageSuccess,
   sendMessageFailed,
+  loadMoreMessages,
+  loadMoreMessagesSuccess,
+  loadMoreMessagesFailed,
 } = messageSlice.actions;
 export default messageSlice.reducer;

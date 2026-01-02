@@ -59,7 +59,7 @@ namespace CoongChat.API.Controllers
         }
 
         [HttpGet("Conversation/{id}/GetPaged")]
-        public async Task<IActionResult> GetMessagesByConversationId(Guid id)
+        public async Task<IActionResult> GetMessagesByConversationId([FromQuery] GetMessagesByConversationIdQuery query, Guid id)
         {
             if (id == Guid.Empty)
             {
@@ -70,7 +70,8 @@ namespace CoongChat.API.Controllers
             {
                 return Unauthorized();
             }
-            var query = new GetMessagesByConversationIdQuery(id, Guid.Parse(userIdClaim));
+            query.ConversationId = id;
+            query.CurrentUserId = Guid.Parse(userIdClaim);
             var result = await _mediator.Send(query);
             return Ok(result);
         }

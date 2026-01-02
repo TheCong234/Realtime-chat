@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IConversation, IConversationState } from "./conversation.type";
+import { IMessage } from "../messages/message.type";
 
 const initialState: IConversationState = {
   conversations: [],
@@ -46,6 +47,26 @@ const conversationSlice = createSlice({
     clearHistoryFailed(state) {
       state.loading = false;
     },
+
+    // Update conversation last message
+    updateConversationLastMessage(state, action: PayloadAction<IMessage>) {
+      const message = action.payload;
+      const conversationIndex = state.conversations.findIndex((conv) => conv.id === message.conversationId);
+
+      if (conversationIndex !== -1) {
+        // Update lastMessage
+        state.conversations[conversationIndex].lastMessage = message;
+
+        // Move conversation to the top of the list
+        const [updatedConversation] = state.conversations.splice(conversationIndex, 1);
+        state.conversations.unshift(updatedConversation);
+      }
+
+      // Also update current conversation if it matches
+      if (state.conversation && state.conversation.id === message.conversationId) {
+        state.conversation.lastMessage = message;
+      }
+    },
   },
 });
 
@@ -59,5 +80,6 @@ export const {
   clearHistory,
   clearHistorySuccess,
   clearHistoryFailed,
+  updateConversationLastMessage,
 } = conversationSlice.actions;
 export default conversationSlice.reducer;

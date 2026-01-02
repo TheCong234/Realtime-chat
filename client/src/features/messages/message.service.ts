@@ -8,7 +8,7 @@ export const messageService = {
   getMessages: async (
     conversationId: string,
     pageNumber = 1,
-    pageSize = 10,
+    pageSize = 50,
   ): Promise<IBaseResponse<IMessagePagedResult>> => {
     const url = `${MESSAGE_API.GET_BY_CONVERSATION_ID}/${conversationId}/GetPaged`;
     const params = buildQueryParams(createPaginationParams(pageNumber, pageSize));

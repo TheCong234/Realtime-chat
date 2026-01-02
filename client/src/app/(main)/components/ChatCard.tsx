@@ -62,7 +62,7 @@ export function ChatCard({
             <span className="text-muted-foreground truncate text-xs">
               {lastMessage?.senderId === currentUser?.id
                 ? "Bạn: "
-                : lastMessage?.sender?.fullName || lastMessage?.sender?.username}
+                : lastMessage?.sender?.fullName || lastMessage?.sender?.username + ": "}
               {lastMessage?.content}
             </span>
             <span className="text-muted-foreground truncate text-xs">{timeAgo(lastMessage?.createdAt || "")}</span>

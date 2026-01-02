@@ -17,7 +17,7 @@ export function ChatMessage({ message, isGroup = false }: IChatMessageProps) {
   const isOwnMessage = message.senderId === currentUser?.id;
 
   return (
-    <div className={cn("group flex gap-2 px-4 py-1", isOwnMessage ? "justify-end" : "justify-start")}>
+    <div className={cn("group flex gap-2 px-4", isOwnMessage ? "justify-end" : "justify-start")}>
       <div className="relative max-w-[70%]">
         <MessageContent message={message} />
 

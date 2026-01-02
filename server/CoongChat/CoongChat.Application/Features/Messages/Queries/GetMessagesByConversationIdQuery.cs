@@ -9,10 +9,5 @@ namespace CoongChat.Application.Features.Messages.Queries
         public Guid ConversationId { get; set; }
         public Guid CurrentUserId { get; set; }
 
-        public GetMessagesByConversationIdQuery(Guid conversationId, Guid currentUserId)
-        {
-            ConversationId = conversationId;
-            CurrentUserId = currentUserId;
-        }
     }
 }
