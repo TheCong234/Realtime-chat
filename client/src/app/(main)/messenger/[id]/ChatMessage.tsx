@@ -13,7 +13,7 @@ interface IChatMessageProps {
 }
 
 export function ChatMessage({ message, isGroup = false }: IChatMessageProps) {
-  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const isOwnMessage = message.senderId === currentUser?.id;
 
   return (

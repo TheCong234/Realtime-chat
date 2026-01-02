@@ -32,7 +32,7 @@ export function ChatCard({
 }: IChatCardProps) {
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
 
   const isActive = pathname === `/messenger/${conversationId}`;
 

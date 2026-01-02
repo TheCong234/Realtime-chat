@@ -16,7 +16,16 @@ export const store = configureStore({
     message: messageReducer,
     user: userReducer,
   },
-  middleware: (gDM) => gDM({ thunk: false }).concat(sagaMiddleware),
+  middleware: (gDM) =>
+    gDM({
+      thunk: false,
+      serializableCheck: {
+        // Ignore these action types
+        ignoredActions: ["user/updateProfileRequest"],
+        // Ignore these field paths in all actions
+        ignoredActionPaths: ["payload.avatarFile"],
+      },
+    }).concat(sagaMiddleware),
 });
 
 sagaMiddleware.run(rootSaga);

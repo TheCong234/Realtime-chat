@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { EllipsisIcon, GalleryVerticalEnd, SearchIcon, SquarePenIcon } from "lucide-react";
+import { EllipsisIcon, SearchIcon, SquarePenIcon } from "lucide-react";
 
 import {
   Sidebar,
@@ -24,7 +24,6 @@ import { OptionDropdown } from "./OptionDropdown";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { UserStatus } from "@/constants/enum";
-import Image from "next/image";
 import { useEffect } from "react";
 import { fetchConversations } from "@/features/conversations/conversation.slice";
 import { IMAGE_DOMAIN } from "@/environments";
@@ -33,7 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch();
-  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const { conversations } = useSelector((state: RootState) => state.conversation);
   const [searchQuery, setSearchQuery] = React.useState("");
 

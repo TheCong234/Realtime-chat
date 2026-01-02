@@ -20,7 +20,7 @@ const ChatPage = () => {
   const conversationId = params.id as string;
   const dispatch = useDispatch();
 
-  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const { messages } = useSelector((state: RootState) => state.message);
   const { conversation } = useSelector((state: RootState) => state.conversation);
 

@@ -35,4 +35,11 @@ export const userService = {
       },
     });
   },
+  getMe: (token: string) => {
+    return axiosClient.get<IBaseResponse<IUser>>(USER_API.GET_ME, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+  },
 };
