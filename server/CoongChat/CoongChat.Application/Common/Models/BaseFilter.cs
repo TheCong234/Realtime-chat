@@ -7,9 +7,8 @@ namespace CoongChat.Application.Common.Models
         public int PageSize { get; set; } = 10;
         public string? Search { get; set; }
 
-        public DateTime? CreatedFrom { get; set; }
-        public DateTime? CreatedTo { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public string? SortBy { get; set; }
-        public bool IsDescending { get; set; } = false;
+        public string? SortDirection { get; set; } = "asc";
     }
 }

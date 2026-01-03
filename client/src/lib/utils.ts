@@ -7,8 +7,24 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function timeAgo(dateInput: string | Date): string {
+  if (!dateInput) return "";
+
   const now = new Date();
-  const diffInSeconds = Math.floor((now.getTime() - new Date(dateInput).getTime()) / 1000);
+  let targetDate: Date;
+
+  if (typeof dateInput === "string") {
+    // If the date string doesn't include timezone info (no 'Z' or offset),
+    // treat it as UTC by appending 'Z'
+    if (!dateInput.includes("Z") && !dateInput.includes("+") && !dateInput.includes("-", 10)) {
+      targetDate = new Date(dateInput + "Z");
+    } else {
+      targetDate = new Date(dateInput);
+    }
+  } else {
+    targetDate = dateInput;
+  }
+
+  const diffInSeconds = Math.floor((now.getTime() - targetDate.getTime()) / 1000);
 
   if (diffInSeconds < 0) return "Vừa xong";
 

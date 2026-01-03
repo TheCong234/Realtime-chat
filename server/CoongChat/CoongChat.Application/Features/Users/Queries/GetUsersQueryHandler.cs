@@ -34,7 +34,7 @@ namespace CoongChat.Application.Features.Users.Handlers
                     Status = request.Status,
                     Search = request.Search,
                     SortBy = request.SortBy,
-                    IsDescending = request.IsDescending
+                    SortDirection = request.SortDirection
 
                 },
                 cancellationToken);

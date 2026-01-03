@@ -25,8 +25,13 @@ export function mergeQueryParams(...params: IBaseQueryParams[]): Record<string, 
 /**
  * Create pagination params
  */
-export function createPaginationParams(pageNumber = 1, pageSize = 10): IPaginationParams {
-  return { pageNumber, pageSize };
+export function createPaginationParams(
+  pageNumber = 1,
+  pageSize = 10,
+  sortBy = "createdAt",
+  sortDirection = "asc",
+): IPaginationParams {
+  return { pageNumber, pageSize, sortBy, sortDirection };
 }
 
 /**

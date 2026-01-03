@@ -25,7 +25,9 @@ namespace CoongChat.Application.Features.Conversations.Queries.GetMyConversation
             {
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize,
-                Search = request.Search
+                Search = request.Search,
+                SortBy = request.SortBy,
+                SortDirection = request.SortDirection
             }, cancellationToken);
 
             foreach (var conversation in data.Items)
@@ -34,7 +36,7 @@ namespace CoongChat.Application.Features.Conversations.Queries.GetMyConversation
                 if (member?.DeletedAt != null && conversation.LastMessage != null && conversation.LastMessage.CreatedAt <= member.DeletedAt)
                 {
                     conversation.LastMessage = null;
-                    conversation.LastMessageId = null; 
+                    conversation.LastMessageId = null;
                 }
             }
 
@@ -43,7 +45,8 @@ namespace CoongChat.Application.Features.Conversations.Queries.GetMyConversation
                 PageNumber = data.PageNumber,
                 PageSize = data.PageSize,
                 TotalCount = data.TotalCount,
-                Items = _mapper.Map<List<ConversationDto>>(data.Items)
+                Items = _mapper.Map<List<ConversationDto>>(data.Items),
+                HasNextPage = data.TotalCount > request.PageSize * request.PageNumber,
             }, "Lây danh sách cuộc hội thoại thành công");
         }
     }

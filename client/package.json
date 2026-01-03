@@ -35,6 +35,7 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.69.0",
     "react-redux": "^9.2.0",
+    "react-virtuoso": "^4.18.1",
     "redux-saga": "^1.4.2",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",

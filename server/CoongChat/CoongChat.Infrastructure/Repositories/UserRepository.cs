@@ -48,23 +48,14 @@ namespace CoongChat.Infrastructure.Repositories
                     (x.FullName != null && x.FullName.ToLower().Contains(keyword)));
             }
 
-            if (filter.CreatedFrom.HasValue)
-            {
-                query = query.Where(x => x.CreatedAt >= filter.CreatedFrom.Value);
-            }
-
-            if (filter.CreatedTo.HasValue)
-            {
-                query = query.Where(x => x.CreatedAt <= filter.CreatedTo.Value);
-            }
 
             if (filter.Status.HasValue)
             {
                 query = query.Where(x => x.Status == filter.Status.Value);
-            }
+            } 
             if (!string.IsNullOrWhiteSpace(filter.SortBy))
             {
-                query = filter.IsDescending
+                query = filter.SortDirection == "desc"
                     ? query.OrderByDescending(e => EF.Property<object>(e, filter.SortBy))
                     : query.OrderBy(e => EF.Property<object>(e, filter.SortBy));
             }

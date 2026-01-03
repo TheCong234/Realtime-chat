@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { IMAGE_DOMAIN } from "@/environments";
 import { updateProfileSchema, UpdateProfileFormValues } from "@/features/user/user.schema";
 import { updateProfileRequest } from "@/features/user/user.slice";
+import { getUserInitials } from "@/lib/utils";
 import { RootState } from "@/store";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { CameraIcon, Loader2 } from "lucide-react";
@@ -29,7 +30,7 @@ interface UpdateProfileDialogProps {
 
 export function UpdateProfileDialog({ open, onOpenChange }: UpdateProfileDialogProps) {
   const dispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const { updateProfileStatus } = useSelector((state: RootState) => state.user);
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -44,15 +45,15 @@ export function UpdateProfileDialog({ open, onOpenChange }: UpdateProfileDialogP
   });
 
   useEffect(() => {
-    if (user && open) {
+    if (currentUser && open) {
       form.reset({
-        fullName: user.fullName || "",
-        phoneNumber: user.phoneNumber || "",
+        fullName: currentUser.fullName || "",
+        phoneNumber: currentUser.phoneNumber || "",
       });
-      setPreviewUrl(IMAGE_DOMAIN + user.avatarUrl);
+      setPreviewUrl(IMAGE_DOMAIN + currentUser.avatarUrl);
       setAvatarFile(null);
     }
-  }, [user, open, form]);
+  }, [currentUser, open, form]);
 
   useEffect(() => {
     if (updateProfileStatus === "success") {
@@ -70,7 +71,7 @@ export function UpdateProfileDialog({ open, onOpenChange }: UpdateProfileDialogP
   };
 
   const onSubmit = (values: UpdateProfileFormValues) => {
-    if (!user) return;
+    if (!currentUser) return;
     dispatch(updateProfileRequest({ values, avatarFile }));
   };
 
@@ -90,8 +91,13 @@ export function UpdateProfileDialog({ open, onOpenChange }: UpdateProfileDialogP
               <div className="flex flex-col items-center gap-4">
                 <div className="group relative cursor-pointer">
                   <Avatar className="h-24 w-24 border border-gray-200">
-                    <AvatarImage src={previewUrl || ""} alt="Avatar" />
-                    <AvatarFallback>{user?.fullName?.charAt(0) || user?.username?.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={previewUrl || IMAGE_DOMAIN + currentUser?.avatarUrl} alt="Avatar" />
+                    <AvatarFallback>
+                      {getUserInitials({
+                        fullName: currentUser?.fullName || "",
+                        username: currentUser?.username || "",
+                      })}
+                    </AvatarFallback>
                   </Avatar>
                   <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity group-hover:opacity-100">
                     <CameraIcon className="h-8 w-8 text-white" />

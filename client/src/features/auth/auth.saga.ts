@@ -1,9 +1,6 @@
 import { call, put, takeLatest } from "redux-saga/effects";
 import { authService } from "./auth.service";
 import {
-  getMeFailure,
-  getMeRequest,
-  getMeSuccess,
   loginFailure,
   loginRequest,
   loginSuccess,
@@ -46,17 +43,7 @@ function* handleRegister(action: ReturnType<typeof registerRequest>) {
   }
 }
 
-function* handleGetMe(action: ReturnType<typeof getMeRequest>) {
-  try {
-    const response: IBaseResponse<IUser> = yield call(authService.getMe, action.payload);
-    yield put(getMeSuccess(response.data));
-  } catch (error: any) {
-    yield put(getMeFailure(error.message));
-  }
-}
-
 export function* authSaga() {
   yield takeLatest(loginRequest.type, handleLogin);
   yield takeLatest(registerRequest.type, handleRegister);
-  yield takeLatest(getMeRequest.type, handleGetMe);
 }

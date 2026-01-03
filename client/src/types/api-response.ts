@@ -12,6 +12,7 @@ export interface IPagedResult<T> {
   pageSize: number;
   totalCount: number;
   items: T[];
+  hasNextPage: boolean;
 }
 
 export type IMessagePagedResult = IPagedResult<IMessage>;

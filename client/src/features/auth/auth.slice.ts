@@ -8,7 +8,6 @@ interface AuthState {
   error: string | null;
   loginStatus: "idle" | "loading" | "success" | "error";
   registerStatus: "idle" | "loading" | "success" | "error";
-  getMeStatus: "idle" | "loading" | "success" | "error";
 }
 
 const initialState: AuthState = {
@@ -17,7 +16,6 @@ const initialState: AuthState = {
   error: null,
   loginStatus: "idle",
   registerStatus: "idle",
-  getMeStatus: "idle",
 };
 
 const authSlice = createSlice({
@@ -60,21 +58,6 @@ const authSlice = createSlice({
       state.registerStatus = "idle";
     },
 
-    //get me
-    getMeRequest(state, _action: PayloadAction<string>) {
-      state.loading = true;
-      state.error = null; // clear lỗi cũ
-    },
-    getMeSuccess(state, action: PayloadAction<IUser>) {
-      state.loading = false;
-      state.user = action.payload;
-      state.getMeStatus = "success";
-    },
-    getMeFailure(state, action: PayloadAction<string>) {
-      state.loading = false;
-      state.error = action.payload;
-      state.getMeStatus = "error";
-    },
     //other
     clearAuthError(state) {
       state.error = null;
@@ -96,9 +79,6 @@ export const {
   registerFailure,
   resetLoginStatus,
   resetRegisterStatus,
-  getMeRequest,
-  getMeSuccess,
-  getMeFailure,
 } = authSlice.actions;
 
 export default authSlice.reducer;

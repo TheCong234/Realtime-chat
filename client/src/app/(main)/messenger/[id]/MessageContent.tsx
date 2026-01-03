@@ -9,7 +9,7 @@ interface IProps {
 }
 
 export function MessageContent({ message }: IProps) {
-  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const baseClass = cn(
     "rounded-2xl px-4 py-2 text-sm break-words",
     message.senderId === currentUser?.id

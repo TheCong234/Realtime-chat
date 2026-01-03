@@ -32,7 +32,7 @@ export function ChatCard({
 }: IChatCardProps) {
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { user: currentUser } = useSelector((state: RootState) => state.auth);
+  const { currentUser } = useSelector((state: RootState) => state.user);
 
   const isActive = pathname === `/messenger/${conversationId}`;
 
@@ -62,7 +62,7 @@ export function ChatCard({
             <span className="text-muted-foreground truncate text-xs">
               {lastMessage?.senderId === currentUser?.id
                 ? "Bạn: "
-                : lastMessage?.sender?.fullName || lastMessage?.sender?.username}
+                : lastMessage?.sender?.fullName || lastMessage?.sender?.username + ": "}
               {lastMessage?.content}
             </span>
             <span className="text-muted-foreground truncate text-xs">{timeAgo(lastMessage?.createdAt || "")}</span>
