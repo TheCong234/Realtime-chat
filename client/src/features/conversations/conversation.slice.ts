@@ -90,6 +90,27 @@ const conversationSlice = createSlice({
         state.conversation.lastMessage = message;
       }
     },
+
+    // Upsert conversation with new message (for realtime updates)
+    upsertConversationWithMessage(state, action: PayloadAction<{ conversation: IConversation; message: IMessage }>) {
+      const { conversation, message } = action.payload;
+      const existingIndex = state.conversations.findIndex((c) => c.id === conversation.id);
+
+      // Update lastMessage on the conversation object
+      const updatedConversation = { ...conversation, lastMessage: message };
+
+      if (existingIndex !== -1) {
+        // Remove existing and add to top
+        state.conversations.splice(existingIndex, 1);
+      }
+      // Add to top of list
+      state.conversations.unshift(updatedConversation);
+
+      // Also update current conversation if it matches
+      if (state.conversation && state.conversation.id === conversation.id) {
+        state.conversation.lastMessage = message;
+      }
+    },
   },
 });
 
@@ -107,5 +128,6 @@ export const {
   clearHistorySuccess,
   clearHistoryFailed,
   updateConversationLastMessage,
+  upsertConversationWithMessage,
 } = conversationSlice.actions;
 export default conversationSlice.reducer;

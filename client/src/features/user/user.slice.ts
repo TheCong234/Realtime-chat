@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { UpdateProfileFormValues } from "./user.schema";
 import { IUser } from "./user.types";
+import { UserStatus } from "@/constants/enum";
 
 interface UserState {
   loading: boolean;
@@ -10,6 +11,9 @@ interface UserState {
   //api status
   updateProfileStatus: "idle" | "loading" | "success" | "error";
   getMeStatus: "idle" | "loading" | "success" | "error";
+
+  // Online users tracking
+  onlineUsers: Record<string, UserStatus>;
 }
 
 const initialState: UserState = {
@@ -19,6 +23,8 @@ const initialState: UserState = {
 
   updateProfileStatus: "idle",
   getMeStatus: "idle",
+
+  onlineUsers: {},
 };
 
 const userSlice = createSlice({
@@ -57,6 +63,14 @@ const userSlice = createSlice({
       state.error = action.payload;
       state.getMeStatus = "error";
     },
+
+    // Real-time user status updates
+    setUserStatus(state, action: PayloadAction<{ userId: string; status: UserStatus }>) {
+      state.onlineUsers[action.payload.userId] = action.payload.status;
+    },
+    setOnlineUsers(state, action: PayloadAction<Record<string, UserStatus>>) {
+      state.onlineUsers = action.payload;
+    },
   },
 });
 
@@ -68,6 +82,8 @@ export const {
   getMeRequest,
   getMeSuccess,
   getMeFailure,
+  setUserStatus,
+  setOnlineUsers,
 } = userSlice.actions;
 
 export default userSlice.reducer;

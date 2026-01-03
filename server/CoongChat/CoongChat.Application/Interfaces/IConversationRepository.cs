@@ -12,5 +12,6 @@ namespace CoongChat.Application.Interfaces
         Task<ConversationMember?> GetMemberAsync(Guid conversationId, Guid userId, CancellationToken cancellationToken);
         Task UpdateMemberAsync(ConversationMember member, CancellationToken cancellationToken);
         Task UpdateAsync(Conversation conversation, CancellationToken cancellationToken);
+        Task<List<Guid>> GetMemberUserIdsAsync(Guid conversationId, CancellationToken cancellationToken);
     }
 }
