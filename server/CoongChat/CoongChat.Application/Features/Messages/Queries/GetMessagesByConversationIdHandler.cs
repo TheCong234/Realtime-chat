@@ -44,7 +44,8 @@ namespace CoongChat.Application.Features.Messages.Queries
                 PageNumber = pagedMessages.PageNumber,
                 PageSize = pagedMessages.PageSize,
                 TotalCount = pagedMessages.TotalCount,
-                Items = mappedItems
+                Items = mappedItems,
+                HasNextPage = pagedMessages.TotalCount > request.PageSize * request.PageNumber,
             }, "Lấy danh sách Messages thành công");
         }
     }

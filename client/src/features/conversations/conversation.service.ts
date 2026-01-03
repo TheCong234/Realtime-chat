@@ -2,13 +2,18 @@ import { axiosClient } from "@/lib/axios";
 import { IBaseResponse, IPagedResult } from "@/types/api-response";
 import { IConversation } from "./conversation.type";
 import { CONVERSATION_API } from "@/constants/endpoint.api";
-import { buildQueryParams, createSearchParams } from "@/lib/query.utils";
+import { buildQueryParams, createPaginationParams, createSearchParams } from "@/lib/query.utils";
 
 export const conversationService = {
-  getConversations: async (searchQuery?: string): Promise<IBaseResponse<IPagedResult<IConversation>>> => {
+  getConversations: async (
+    searchQuery?: string,
+    pageNumber: number = 1,
+    pageSize: number = 50,
+  ): Promise<IBaseResponse<IPagedResult<IConversation>>> => {
     const url = CONVERSATION_API.GET_PAGED;
     const params = buildQueryParams({
       values: "all",
+      ...createPaginationParams(pageNumber, pageSize, "createdAt", "desc"),
       ...createSearchParams(searchQuery),
     });
 

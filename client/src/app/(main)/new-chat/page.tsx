@@ -2,12 +2,15 @@
 import Footer from "../components/Footer";
 import { ReceipientsAutocomplete } from "@/app/(main)/new-chat/ReceipientsAutocomplete";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { IUser } from "@/features/user/user.types";
 import { messageService } from "@/features/messages/message.service";
+import { fetchConversations } from "@/features/conversations/conversation.slice";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
 const NewChatPage = () => {
+  const dispatch = useDispatch();
   const [selectedUsers, setSelectedUsers] = useState<IUser[]>([]);
   const [isSending, setIsSending] = useState(false);
 
@@ -30,6 +33,9 @@ const NewChatPage = () => {
         content: content.trim(),
       });
       toast.success(`Đã gửi tin nhắn đến ${selectedUsers.length} người nhận`);
+
+      // Reload conversations to update the sidebar with new conversation
+      dispatch(fetchConversations());
 
       setSelectedUsers([]);
     } catch (error: any) {

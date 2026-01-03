@@ -11,7 +11,7 @@ export const messageService = {
     pageSize = 50,
   ): Promise<IBaseResponse<IMessagePagedResult>> => {
     const url = `${MESSAGE_API.GET_BY_CONVERSATION_ID}/${conversationId}/GetPaged`;
-    const params = buildQueryParams(createPaginationParams(pageNumber, pageSize));
+    const params = buildQueryParams(createPaginationParams(pageNumber, pageSize, "createdAt", "desc"));
 
     return axiosClient.get(url, {
       params,

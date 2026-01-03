@@ -25,4 +25,7 @@ export interface IConversationState {
   conversation: IConversation | null;
   loading: boolean;
   searchQuery: string;
+  hasMore: boolean;
+  loadingMore: boolean;
+  pageNumber: number;
 }

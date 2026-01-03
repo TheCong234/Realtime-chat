@@ -53,6 +53,10 @@ namespace CoongChat.Infrastructure.Repositories
                 ));
             }
 
+            query = query.OrderByDescending(c => c.LastMessage != null
+                ? c.LastMessage.CreatedAt
+                : c.CreatedAt); // Giả sử Conversation có trường CreatedAt
+
             var totalCount = await query.CountAsync(cancellationToken);
 
             var items = await query

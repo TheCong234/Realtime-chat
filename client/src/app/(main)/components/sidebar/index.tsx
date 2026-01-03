@@ -1,6 +1,9 @@
 "use client";
 import * as React from "react";
 import { EllipsisIcon, SearchIcon, SquarePenIcon } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
+import { Virtuoso, VirtuosoHandle } from "react-virtuoso";
+import { toast } from "sonner";
 
 import {
   Sidebar,
@@ -24,34 +27,72 @@ import { OptionDropdown } from "./OptionDropdown";
 import { RootState } from "@/store";
 import { useDispatch, useSelector } from "react-redux";
 import { UserStatus } from "@/constants/enum";
-import { useEffect } from "react";
-import { fetchConversations } from "@/features/conversations/conversation.slice";
+import { fetchConversations, loadMoreConversations } from "@/features/conversations/conversation.slice";
 import { IMAGE_DOMAIN } from "@/environments";
 import { getUserInitials } from "@/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const dispatch = useDispatch();
+  const virtuosoRef = useRef<VirtuosoHandle>(null);
+  const isInitializedRef = useRef(false);
+  const isLoadingMoreRef = useRef(false);
+  const hasShownEndToastRef = useRef(false);
+
   const { currentUser } = useSelector((state: RootState) => state.user);
-  const { conversations } = useSelector((state: RootState) => state.conversation);
+  const { conversations, hasMore, loadingMore } = useSelector((state: RootState) => state.conversation);
   const [searchQuery, setSearchQuery] = React.useState("");
 
   // Initial fetch without search
   useEffect(() => {
+    isInitializedRef.current = false;
+    hasShownEndToastRef.current = false;
     dispatch(fetchConversations());
   }, [dispatch]);
+
+  // Mark as initialized after first load
+  useEffect(() => {
+    if (conversations.length > 0 && !isInitializedRef.current) {
+      isInitializedRef.current = true;
+    }
+  }, [conversations.length]);
 
   // Debounced search effect
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+      isInitializedRef.current = false;
+      hasShownEndToastRef.current = false;
       dispatch(fetchConversations(searchQuery));
     }, 500); // 500ms debounce
 
     return () => clearTimeout(timeoutId);
   }, [searchQuery, dispatch]);
+
+  // Handle loading more state
+  useEffect(() => {
+    if (isLoadingMoreRef.current && !loadingMore) {
+      isLoadingMoreRef.current = false;
+    }
+  }, [loadingMore]);
+
+  // Handle load more when reaching bottom
+  const handleEndReached = useCallback(() => {
+    if (!isInitializedRef.current) return;
+
+    if (hasMore && !isLoadingMoreRef.current) {
+      isLoadingMoreRef.current = true;
+      dispatch(loadMoreConversations());
+    } else if (!hasMore && isInitializedRef.current && !hasShownEndToastRef.current) {
+      hasShownEndToastRef.current = true;
+      toast.info("Bạn đã xem hết cuộc hội thoại", {
+        duration: 2000,
+      });
+    }
+  }, [hasMore, dispatch]);
+
   return (
     <Sidebar {...props}>
-      <Tabs defaultValue="all">
+      <Tabs defaultValue="all" className="flex h-full flex-col">
         <SidebarHeader>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -164,25 +205,41 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarHeader>
 
         {/* all conversations tab  */}
-        <SidebarContent className="p-2">
-          <TabsContent value="all">
-            {conversations.map((conversation) => {
-              const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
-              const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
-              const avatarUrl = conversation.avatarUrl || (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "");
+        <SidebarContent className="flex-1 p-2">
+          <TabsContent value="all" className="m-0 flex h-full flex-col">
+            <Virtuoso
+              ref={virtuosoRef}
+              style={{ height: "100%" }}
+              data={conversations}
+              endReached={handleEndReached}
+              atBottomThreshold={200}
+              itemContent={(index, conversation) => {
+                const partner = conversation.members.find((m) => m.userId !== currentUser?.id);
+                const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
+                const avatarUrl =
+                  conversation.avatarUrl || (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "");
 
-              return (
-                <div key={conversation.id}>
-                  <ChatCard
-                    name={name}
-                    lastMessage={conversation.lastMessage || null}
-                    conversationId={conversation.id}
-                    avatarUrl={avatarUrl}
-                    userStatus={partner?.userStatus || UserStatus.Offline}
-                  />
-                </div>
-              );
-            })}
+                return (
+                  <div key={conversation.id}>
+                    <ChatCard
+                      name={name}
+                      lastMessage={conversation.lastMessage || null}
+                      conversationId={conversation.id}
+                      avatarUrl={avatarUrl}
+                      userStatus={partner?.userStatus || UserStatus.Offline}
+                    />
+                  </div>
+                );
+              }}
+              components={{
+                Footer: () =>
+                  loadingMore ? (
+                    <div className="flex justify-center py-2">
+                      <span className="text-xs text-gray-400">Đang tải...</span>
+                    </div>
+                  ) : null,
+              }}
+            />
           </TabsContent>
           <TabsContent value="unread">
             <div>unread tab content</div>

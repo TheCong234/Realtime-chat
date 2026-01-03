@@ -1,4 +1,4 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest, select } from "redux-saga/effects";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { conversationService } from "./conversation.service";
 import { IConversation } from "./conversation.type";
@@ -6,6 +6,9 @@ import {
   fetchConversations,
   fetchConversationsFailed,
   fetchConversationsSuccess,
+  loadMoreConversations,
+  loadMoreConversationsSuccess,
+  loadMoreConversationsFailed,
   fetchConversationDetails,
   fetchConversationDetailsSuccess,
   fetchConversationDetailsFailed,
@@ -15,6 +18,7 @@ import {
 } from "./conversation.slice";
 import { IBaseResponse, IPagedResult } from "@/types/api-response";
 import { toast } from "sonner";
+import { RootState } from "@/store";
 
 function* fetchConversationsSaga(action: PayloadAction<string | undefined>) {
   try {
@@ -22,12 +26,42 @@ function* fetchConversationsSaga(action: PayloadAction<string | undefined>) {
     const response: IBaseResponse<IPagedResult<IConversation>> = yield call(
       conversationService.getConversations,
       searchQuery,
+      1,
     );
 
-    yield put(fetchConversationsSuccess(response.data.items));
+    yield put(
+      fetchConversationsSuccess({
+        items: response.data.items,
+        hasMore: response.data.hasNextPage,
+      }),
+    );
   } catch (error) {
     console.log("Failed to fetch conversations", error);
     yield put(fetchConversationsFailed());
+  }
+}
+
+function* loadMoreConversationsSaga() {
+  try {
+    const state: RootState = yield select();
+    const { pageNumber, searchQuery } = state.conversation;
+
+    const response: IBaseResponse<IPagedResult<IConversation>> = yield call(
+      conversationService.getConversations,
+      searchQuery,
+      pageNumber + 1,
+    );
+
+    yield put(
+      loadMoreConversationsSuccess({
+        items: response.data.items,
+        hasMore: response.data.hasNextPage,
+        pageNumber: response.data.pageNumber,
+      }),
+    );
+  } catch (error) {
+    console.log("Failed to load more conversations", error);
+    yield put(loadMoreConversationsFailed());
   }
 }
 
@@ -46,8 +80,8 @@ function* clearHistorySaga(action: PayloadAction<string>) {
   try {
     const conversationId = action.payload;
     yield call(conversationService.clearHistory, conversationId);
-    yield put(clearHistorySuccess());
-    toast.success("Đã xóa lịch sử chat thành công");
+    yield put(clearHistorySuccess(conversationId));
+    toast.success("Đã xóa cuộc hội thoại thành công");
   } catch (error: any) {
     console.log("Failed to clear conversation history", error);
     yield put(clearHistoryFailed());
@@ -57,6 +91,7 @@ function* clearHistorySaga(action: PayloadAction<string>) {
 
 export function* conversationSaga() {
   yield takeLatest(fetchConversations.type, fetchConversationsSaga);
+  yield takeLatest(loadMoreConversations.type, loadMoreConversationsSaga);
   yield takeLatest(fetchConversationDetails.type, fetchConversationDetailsSaga);
   yield takeLatest(clearHistory.type, clearHistorySaga);
 }

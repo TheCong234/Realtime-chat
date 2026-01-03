@@ -7,6 +7,9 @@ const initialState: IConversationState = {
   conversation: null,
   loading: false,
   searchQuery: "",
+  hasMore: true,
+  loadingMore: false,
+  pageNumber: 1,
 };
 
 const conversationSlice = createSlice({
@@ -16,13 +19,32 @@ const conversationSlice = createSlice({
     fetchConversations(state, action: PayloadAction<string | undefined>) {
       state.loading = true;
       state.searchQuery = action.payload || "";
+      state.pageNumber = 1;
+      state.hasMore = true;
     },
-    fetchConversationsSuccess(state, action: PayloadAction<IConversation[]>) {
+    fetchConversationsSuccess(state, action: PayloadAction<{ items: IConversation[]; hasMore: boolean }>) {
       state.loading = false;
-      state.conversations = action.payload;
+      state.conversations = action.payload.items;
+      state.hasMore = action.payload.hasMore;
     },
     fetchConversationsFailed(state) {
       state.loading = false;
+    },
+
+    loadMoreConversations(state) {
+      state.loadingMore = true;
+    },
+    loadMoreConversationsSuccess(
+      state,
+      action: PayloadAction<{ items: IConversation[]; hasMore: boolean; pageNumber: number }>,
+    ) {
+      state.loadingMore = false;
+      state.conversations = [...state.conversations, ...action.payload.items];
+      state.hasMore = action.payload.hasMore;
+      state.pageNumber = action.payload.pageNumber;
+    },
+    loadMoreConversationsFailed(state) {
+      state.loadingMore = false;
     },
 
     //get conversation details
@@ -41,8 +63,9 @@ const conversationSlice = createSlice({
     clearHistory(state, action: PayloadAction<string>) {
       state.loading = true;
     },
-    clearHistorySuccess(state) {
+    clearHistorySuccess(state, action: PayloadAction<string>) {
       state.loading = false;
+      state.conversations = state.conversations.filter((conv) => conv.id !== action.payload);
     },
     clearHistoryFailed(state) {
       state.loading = false;
@@ -74,6 +97,9 @@ export const {
   fetchConversations,
   fetchConversationsSuccess,
   fetchConversationsFailed,
+  loadMoreConversations,
+  loadMoreConversationsSuccess,
+  loadMoreConversationsFailed,
   fetchConversationDetails,
   fetchConversationDetailsSuccess,
   fetchConversationDetailsFailed,
