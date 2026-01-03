@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using CoongChat.API.Hubs;
+using CoongChat.API.Services;
 
 namespace CoongChat.API
 {
@@ -69,6 +71,9 @@ namespace CoongChat.API
 
             builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Add SignalR
+            builder.Services.AddSignalR();
+
             //JWT Authentication
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
@@ -86,6 +91,21 @@ namespace CoongChat.API
                     ),
 
                     ClockSkew = TimeSpan.Zero
+                };
+
+                // Configure JWT for SignalR
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        var accessToken = context.Request.Query["access_token"];
+                        var path = context.HttpContext.Request.Path;
+                        if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/hubs"))
+                        {
+                            context.Token = accessToken;
+                        }
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -106,6 +126,9 @@ namespace CoongChat.API
             builder.Services.AddScoped<IMessageRepository, MessageRepository>();
             builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
             builder.Services.AddScoped<IDatabaseService, DatabaseService>();
+            builder.Services.AddScoped<IUserConnectionRepository, UserConnectionRepository>();
+            builder.Services.AddScoped<IMessageStatusRepository, MessageStatusRepository>();
+            builder.Services.AddScoped<IChatNotificationService, ChatNotificationService>();
             #endregion
 
             #region  REGISTER MEDIATR  - VALIDATORS
@@ -160,6 +183,9 @@ namespace CoongChat.API
 
 
             app.MapControllers();
+
+            // Map SignalR Hub
+            app.MapHub<ChatHub>("/hubs/chat");
 
             app.Run();
         }

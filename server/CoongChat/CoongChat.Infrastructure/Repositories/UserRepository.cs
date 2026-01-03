@@ -1,6 +1,7 @@
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Filters;
 using CoongChat.Application.Interfaces;
+using CoongChat.Domain.Common;
 using CoongChat.Domain.Entities;
 using CoongChat.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
@@ -52,7 +53,7 @@ namespace CoongChat.Infrastructure.Repositories
             if (filter.Status.HasValue)
             {
                 query = query.Where(x => x.Status == filter.Status.Value);
-            } 
+            }
             if (!string.IsNullOrWhiteSpace(filter.SortBy))
             {
                 query = filter.SortDirection == "desc"
@@ -103,6 +104,17 @@ namespace CoongChat.Infrastructure.Repositories
                 .Where(u => userIds.Contains(u.Id))
                 .CountAsync(cancellationToken);
             return count == userIds.Count;
+        }
+
+        public async Task UpdateStatusAsync(Guid userId, UserStatus status, CancellationToken ct = default)
+        {
+            var user = await _context.Users.FindAsync(new object[] { userId }, ct);
+            if (user != null)
+            {
+                user.Status = status;
+                user.LastOnlineAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync(ct);
+            }
         }
     }
 }

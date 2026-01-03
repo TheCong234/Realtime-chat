@@ -6,9 +6,14 @@ import { SidebarProvider } from "@/components/ui/sidebar";
 import { SidebarInset } from "@/components/ui/sidebar";
 import AuthGuard from "@/components/AuthGuard";
 import { AppSidebar } from "./components/sidebar";
+import { useSignalR } from "@/hooks/useSignalR";
 
 export default function LayoutClient({ children }: Readonly<{ children: React.ReactNode }>) {
   const dispatch = useDispatch();
+
+  // Initialize SignalR connection
+  useSignalR();
+
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (token) {

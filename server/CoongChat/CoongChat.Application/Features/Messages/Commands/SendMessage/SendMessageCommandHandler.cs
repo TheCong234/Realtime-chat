@@ -1,5 +1,6 @@
 using AutoMapper;
 using CoongChat.Application.Common.Models;
+using CoongChat.Application.Features.Conversations.Dto;
 using CoongChat.Application.Features.Messages.Dto;
 using CoongChat.Application.Interfaces;
 using CoongChat.Domain.Entities;
@@ -11,16 +12,18 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IConversationRepository _conversationRepository;
-
+        private readonly IChatNotificationService _chatNotificationService;
         private readonly IMapper _mapper;
 
         public SendMessageCommandHandler(
             IMessageRepository messageRepository,
             IConversationRepository conversationRepository,
+            IChatNotificationService chatNotificationService,
             IMapper mapper)
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
+            _chatNotificationService = chatNotificationService;
             _mapper = mapper;
         }
 
@@ -57,8 +60,18 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
             conversation.LastMessageId = message.Id;
             await _conversationRepository.UpdateAsync(conversation, cancellationToken);
 
-            return BaseResponse<MessageDto>.Ok(_mapper.Map<MessageDto>(message), "Tin nhắn đã được gửi"
-            );
+            var messageDto = _mapper.Map<MessageDto>(message);
+
+            // Get all member userIds and broadcast message to them via SignalR
+            var memberUserIds = conversation.Members.Select(m => m.UserId).ToList();
+
+            await _chatNotificationService.SendMessageToUsersAsync(
+                memberUserIds,
+                _mapper.Map<ConversationDto>(conversation),
+                messageDto,
+                cancellationToken);
+
+            return BaseResponse<MessageDto>.Ok(messageDto, "Tin nhắn đã được gửi");
         }
 
     }

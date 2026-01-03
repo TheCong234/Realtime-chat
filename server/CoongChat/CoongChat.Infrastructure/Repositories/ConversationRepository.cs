@@ -105,5 +105,14 @@ namespace CoongChat.Infrastructure.Repositories
             _context.ConversationMembers.Update(member);
             await _context.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<List<Guid>> GetMemberUserIdsAsync(Guid conversationId, CancellationToken cancellationToken)
+        {
+            return await _context.ConversationMembers
+                .AsNoTracking()
+                .Where(m => m.ConversationId == conversationId)
+                .Select(m => m.UserId)
+                .ToListAsync(cancellationToken);
+        }
     }
 }

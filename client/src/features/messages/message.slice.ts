@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IMessage, ISendMessagePayload } from "./message.type";
+import { MessageReadStatus } from "@/constants/enum";
 
 interface IMessageState {
   messages: IMessage[];
@@ -74,6 +75,21 @@ const messageSlice = createSlice({
       state.loadingMore = false;
       state.error = action.payload;
     },
+
+    // Real-time message updates
+    receiveMessage(state, action: PayloadAction<IMessage>) {
+      // Only add if not already exists (avoid duplicates)
+      const exists = state.messages.some((m) => m.id === action.payload.id);
+      if (!exists) {
+        state.messages.push(action.payload);
+      }
+    },
+    updateMessageStatus(state, action: PayloadAction<{ messageId: string; status: MessageReadStatus }>) {
+      const message = state.messages.find((m) => m.id === action.payload.messageId);
+      if (message) {
+        message.status = action.payload.status;
+      }
+    },
   },
 });
 
@@ -88,5 +104,7 @@ export const {
   loadMoreMessages,
   loadMoreMessagesSuccess,
   loadMoreMessagesFailed,
+  receiveMessage,
+  updateMessageStatus,
 } = messageSlice.actions;
 export default messageSlice.reducer;

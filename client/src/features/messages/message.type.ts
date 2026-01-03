@@ -1,4 +1,4 @@
-import { MessageType } from "@/constants/enum";
+import { MessageType, MessageReadStatus } from "@/constants/enum";
 
 export interface IMessageSender {
   id: string;
@@ -24,6 +24,7 @@ export interface IMessage {
   content: string;
   createdAt: string;
   sender: IMessageSender;
+  status?: MessageReadStatus; // Optional: message delivery/read status
 }
 
 export interface ISendMessagePayload {

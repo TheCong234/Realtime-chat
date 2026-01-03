@@ -1,5 +1,6 @@
 using CoongChat.Application.Common.Models;
 using CoongChat.Application.Filters;
+using CoongChat.Domain.Common;
 using CoongChat.Domain.Entities;
 
 namespace CoongChat.Application.Interfaces
@@ -16,5 +17,6 @@ namespace CoongChat.Application.Interfaces
         Task UpdateAsync(User user);
         Task DeleteAsync(User user);
         Task SaveRefreshTokenAsync(Guid userId, string refreshToken);
+        Task UpdateStatusAsync(Guid userId, UserStatus status, CancellationToken ct = default);
     }
 }

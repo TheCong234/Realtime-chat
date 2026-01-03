@@ -39,7 +39,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const isLoadingMoreRef = useRef(false);
   const hasShownEndToastRef = useRef(false);
 
-  const { currentUser } = useSelector((state: RootState) => state.user);
+  const { currentUser, onlineUsers } = useSelector((state: RootState) => state.user);
   const { conversations, hasMore, loadingMore } = useSelector((state: RootState) => state.conversation);
   const [searchQuery, setSearchQuery] = React.useState("");
 
@@ -218,7 +218,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 const name = conversation.name || partner?.fullName || partner?.username || "Unknown";
                 const avatarUrl =
                   conversation.avatarUrl || (partner?.avatarUrl ? IMAGE_DOMAIN + partner.avatarUrl : "");
-
+                const userStatus = onlineUsers[partner?.userId || ""] || UserStatus.Offline;
                 return (
                   <div key={conversation.id}>
                     <ChatCard
@@ -226,7 +226,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                       lastMessage={conversation.lastMessage || null}
                       conversationId={conversation.id}
                       avatarUrl={avatarUrl}
-                      userStatus={partner?.userStatus || UserStatus.Offline}
+                      userStatus={userStatus}
                     />
                   </div>
                 );
