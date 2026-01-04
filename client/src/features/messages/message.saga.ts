@@ -15,6 +15,8 @@ import {
 import { PayloadAction } from "@reduxjs/toolkit";
 import { IBaseResponse, IMessagePagedResult } from "@/types/api-response";
 import { updateConversationLastMessage } from "../conversations/conversation.slice";
+import { getErrorMessage } from "@/lib/utils";
+import { AxiosError } from "axios";
 
 function* fetchMessagesSaga(action: PayloadAction<string>) {
   try {
@@ -22,9 +24,8 @@ function* fetchMessagesSaga(action: PayloadAction<string>) {
     const response: IBaseResponse<IMessagePagedResult> = yield call(messageService.getMessages, conversationId, 1, 50);
     const hasMore = response.data.pageNumber * response.data.pageSize < response.data.totalCount;
     yield put(fetchMessagesSuccess({ messages: response.data.items, hasMore }));
-  } catch (error: any) {
-    console.log("Failed to fetch messages", error);
-    yield put(fetchMessagesFailed(error?.message || "Failed to fetch messages"));
+  } catch (error) {
+    yield put(fetchMessagesFailed(getErrorMessage(error)));
   }
 }
 
@@ -34,9 +35,8 @@ function* sendMessageSaga(action: PayloadAction<ISendMessagePayload>) {
     yield put(sendMessageSuccess(response.data));
     // Update lastMessage in conversations state
     yield put(updateConversationLastMessage(response.data));
-  } catch (error: any) {
-    console.log("Failed to send message", error);
-    yield put(sendMessageFailed(error?.message || "Failed to send message"));
+  } catch (error) {
+    yield put(sendMessageFailed(getErrorMessage(error)));
   }
 }
 
@@ -44,7 +44,7 @@ function* loadMoreMessagesSaga(action: PayloadAction<string>) {
   try {
     const conversationId = action.payload;
     // Get current state to know which page to fetch
-    const state: { message: { pageNumber: number } } = yield select((state: any) => state);
+    const state: { message: { pageNumber: number } } = yield select((s: { message: { pageNumber: number } }) => s);
     const nextPage = state.message.pageNumber + 1;
 
     const response: IBaseResponse<IMessagePagedResult> = yield call(
@@ -57,9 +57,9 @@ function* loadMoreMessagesSaga(action: PayloadAction<string>) {
 
     const hasMore = response.data.pageNumber * response.data.pageSize < response.data.totalCount;
     yield put(loadMoreMessagesSuccess({ messages: response.data.items, hasMore }));
-  } catch (error: any) {
-    console.log("Failed to load more messages", error);
-    yield put(loadMoreMessagesFailed(error?.message || "Failed to load more messages"));
+  } catch (error) {
+    const err = error as AxiosError<{ message: string }>;
+    yield put(loadMoreMessagesFailed(getErrorMessage(err)));
   }
 }
 

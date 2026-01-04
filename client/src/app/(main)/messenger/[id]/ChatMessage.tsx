@@ -9,10 +9,10 @@ import { RootState } from "@/store";
 
 interface IChatMessageProps {
   message: IMessage;
-  isGroup?: boolean;
+  // isGroup?: boolean;
 }
 
-export function ChatMessage({ message, isGroup = false }: IChatMessageProps) {
+export function ChatMessage({ message }: IChatMessageProps) {
   const { currentUser } = useSelector((state: RootState) => state.user);
   const isOwnMessage = message.senderId === currentUser?.id;
 

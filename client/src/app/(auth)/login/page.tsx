@@ -8,13 +8,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { clearAuthError, loginRequest } from "@/features/auth/auth.slice";
 import { useForm } from "react-hook-form";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, Suspense } from "react";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
 
-const LoginPage = () => {
+const LoginPageContent = () => {
   const dispatch = useDispatch();
-  const { loading, error, loginStatus } = useSelector((state: RootState) => state.auth);
+  const { error, loginStatus } = useSelector((state: RootState) => state.auth);
   const searchParams = useSearchParams();
   const hasShownToast = useRef(false);
   const router = useRouter();
@@ -42,7 +42,7 @@ const LoginPage = () => {
         },
       });
     }
-  }, [searchParams]);
+  }, [searchParams, dispatch, router]);
 
   useEffect(() => {
     if (loginStatus === "success") {
@@ -55,7 +55,7 @@ const LoginPage = () => {
       toast.error(error);
       dispatch(clearAuthError());
     }
-  }, [loginStatus, error]);
+  }, [loginStatus, error, dispatch, router]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
@@ -153,6 +153,14 @@ const LoginPage = () => {
         </div>
       </div>
     </div>
+  );
+};
+
+const LoginPage = () => {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <LoginPageContent />
+    </Suspense>
   );
 };
 

@@ -19,6 +19,7 @@ import {
 import { IBaseResponse, IPagedResult } from "@/types/api-response";
 import { toast } from "sonner";
 import { RootState } from "@/store";
+import { getErrorMessage } from "@/lib/utils";
 
 function* fetchConversationsSaga(action: PayloadAction<string | undefined>) {
   try {
@@ -82,10 +83,10 @@ function* clearHistorySaga(action: PayloadAction<string>) {
     yield call(conversationService.clearHistory, conversationId);
     yield put(clearHistorySuccess(conversationId));
     toast.success("Đã xóa cuộc hội thoại thành công");
-  } catch (error: any) {
-    console.log("Failed to clear conversation history", error);
+  } catch (error) {
+    const message = getErrorMessage(error);
     yield put(clearHistoryFailed());
-    toast.error(error?.response?.data?.message || "Xóa lịch sử chat thất bại");
+    toast.error(message);
   }
 }
 

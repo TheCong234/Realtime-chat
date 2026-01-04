@@ -72,7 +72,7 @@ const ChatPage = () => {
         });
       }, 100);
     }
-  }, [messages.length]);
+  }, [messages]);
 
   /** ================= HANDLE LOAD MORE ================= */
   useEffect(() => {
@@ -190,7 +190,7 @@ const ChatPage = () => {
             followOutput={followOutput}
             itemContent={(index, message) => (
               <div className="pb-2">
-                <ChatMessage key={message.id} message={message} isGroup={conversation?.type === 1} />
+                <ChatMessage key={message.id} message={message} />
               </div>
             )}
             components={{

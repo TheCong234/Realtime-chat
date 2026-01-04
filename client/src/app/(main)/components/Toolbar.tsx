@@ -11,7 +11,7 @@ interface IToolbarProps {
   status: UserStatus;
   setShowInfo: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const Toolbar = React.memo(({ name, avatar, status, setShowInfo }: IToolbarProps) => {
+const Toolbar = ({ name, avatar, status, setShowInfo }: IToolbarProps) => {
   return (
     <div className="border-border flex items-center justify-between border-b p-3">
       <div className="flex items-center gap-3">
@@ -48,6 +48,6 @@ const Toolbar = React.memo(({ name, avatar, status, setShowInfo }: IToolbarProps
       </div>
     </div>
   );
-});
+};
 
-export default Toolbar;
+export default React.memo(Toolbar);

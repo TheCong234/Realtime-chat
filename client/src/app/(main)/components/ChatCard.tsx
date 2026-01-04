@@ -10,7 +10,6 @@ import { cn, getUserInitials, timeAgo } from "@/lib/utils";
 import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { IUser } from "@/features/user/user.types";
 import { UserStatus } from "@/constants/enum";
 
 interface IChatCardProps {

@@ -3,7 +3,7 @@ import type { IBaseQueryParams, IPaginationParams, ISearchParams } from "@/types
 /**
  * Build query params, removing undefined/null/empty values
  */
-export function buildQueryParams<T extends IBaseQueryParams>(params: T): Record<string, any> {
+export function buildQueryParams<T extends IBaseQueryParams>(params: T): Record<string, unknown> {
   return Object.entries(params).reduce(
     (acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== "") {
@@ -11,14 +11,14 @@ export function buildQueryParams<T extends IBaseQueryParams>(params: T): Record<
       }
       return acc;
     },
-    {} as Record<string, any>,
+    {} as Record<string, unknown>,
   );
 }
 
 /**
  * Merge multiple query param objects
  */
-export function mergeQueryParams(...params: IBaseQueryParams[]): Record<string, any> {
+export function mergeQueryParams(...params: IBaseQueryParams[]): Record<string, unknown> {
   return buildQueryParams(Object.assign({}, ...params));
 }
 

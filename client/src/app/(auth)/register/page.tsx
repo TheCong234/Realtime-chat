@@ -47,7 +47,7 @@ const RegisterPage = () => {
       toast.error(error);
       dispatch(clearAuthError());
     }
-  }, [registerStatus, error]);
+  }, [registerStatus, error, dispatch, router]);
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50">
       <div className="grid w-full max-w-6xl grid-cols-1 md:grid-cols-2">
