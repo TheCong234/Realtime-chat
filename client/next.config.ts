@@ -11,6 +11,12 @@ const nextConfig: NextConfig = {
         port: "5053",
         pathname: "/uploads/**", // Cho phép tất cả ảnh trong thư mục uploads
       },
+      {
+        protocol: "http",
+        hostname: "164.152.167.138",
+        port: "5053",
+        pathname: "/uploads/**", // VPS production
+      },
     ],
   },
 };
