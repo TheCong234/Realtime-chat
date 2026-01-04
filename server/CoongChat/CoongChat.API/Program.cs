@@ -29,19 +29,24 @@ namespace CoongChat.API
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            // Configure CORS for Docker and development
+            var allowedOrigins = builder.Configuration.GetSection("AllowedOrigins").Get<string[]>() 
+                ?? new[] { "http://localhost:3000", "http://frontend:3000" };
+            
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", policy =>
                 {
                     policy
-                        .WithOrigins(
-                            "http://localhost:3000"
-                        )
+                        .WithOrigins(allowedOrigins)
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
                 });
             });
+
+            // Add health checks for Docker
+            builder.Services.AddHealthChecks();
 
             builder.Services.AddControllers().ConfigureApiBehaviorOptions(options =>
             {
@@ -186,6 +191,9 @@ namespace CoongChat.API
 
             // Map SignalR Hub
             app.MapHub<ChatHub>("/hubs/chat");
+
+            // Map health check endpoint for Docker
+            app.MapHealthChecks("/health");
 
             app.Run();
         }
