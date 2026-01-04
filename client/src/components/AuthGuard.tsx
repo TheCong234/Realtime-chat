@@ -3,7 +3,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();

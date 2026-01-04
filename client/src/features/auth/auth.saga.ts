@@ -9,9 +9,9 @@ import {
   registerSuccess,
 } from "./auth.slice";
 import { IAuthResponse } from "./auth.types";
-import { IUser } from "../user/user.types";
 import { toast } from "sonner";
 import { IBaseResponse } from "@/types/api-response";
+import { getErrorMessage } from "@/lib/utils";
 
 function* handleLogin(action: ReturnType<typeof loginRequest>) {
   try {
@@ -22,9 +22,10 @@ function* handleLogin(action: ReturnType<typeof loginRequest>) {
 
     yield put(loginSuccess());
     toast.success("Đăng nhập thành công");
-  } catch (error: any) {
-    yield put(loginFailure(error.message));
-    toast.error(error.message || "Đăng nhập thất bại");
+  } catch (error) {
+    const message = getErrorMessage(error);
+    yield put(loginFailure(message));
+    toast.error(message);
   }
 }
 
@@ -37,9 +38,10 @@ function* handleRegister(action: ReturnType<typeof registerRequest>) {
 
     yield put(registerSuccess());
     toast.success("Đăng ký thành công");
-  } catch (error: any) {
-    yield put(registerFailure(error.message));
-    toast.error(error.message || "Đăng ký thất bại");
+  } catch (error) {
+    const message = getErrorMessage(error);
+    yield put(registerFailure(message));
+    toast.error(message);
   }
 }
 

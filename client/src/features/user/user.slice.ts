@@ -32,6 +32,7 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     updateProfileRequest(state, _action: PayloadAction<{ values: UpdateProfileFormValues; avatarFile: File | null }>) {
+      void _action;
       state.error = null;
       state.updateProfileStatus = "loading";
     },
@@ -50,6 +51,7 @@ const userSlice = createSlice({
 
     //get me
     getMeRequest(state, _action: PayloadAction<string>) {
+      void _action;
       state.loading = true;
       state.error = null; // clear lỗi cũ
     },

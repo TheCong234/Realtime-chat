@@ -3,6 +3,7 @@ import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { MessageType } from "@/constants/enum";
+import Image from "next/image";
 
 interface IProps {
   message: IMessage;
@@ -18,11 +19,29 @@ export function MessageContent({ message }: IProps) {
   );
 
   if (message.type === MessageType.Image) {
-    return <img src={message.content} alt="image" className="max-w-xs rounded-xl object-cover" />;
+    return (
+      <Image
+        src={message.content}
+        alt="image"
+        width={0}
+        height={0}
+        sizes="100vw"
+        className="h-auto w-auto max-w-xs rounded-xl object-cover"
+      />
+    );
   }
 
   if (message.type === MessageType.Sticker) {
-    return <img src={message.content} alt="sticker" className="h-28 w-28 object-contain" />;
+    return (
+      <Image
+        src={message.content}
+        alt="sticker"
+        width={0}
+        height={0}
+        sizes="100vw"
+        className="h-28 w-28 object-contain"
+      />
+    );
   }
 
   // text

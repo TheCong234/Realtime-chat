@@ -24,6 +24,7 @@ const authSlice = createSlice({
   reducers: {
     //login
     loginRequest(state, _action: PayloadAction<ILoginPayload>) {
+      void _action;
       state.loading = true;
       state.error = null; // clear lỗi cũ
     },
@@ -42,6 +43,7 @@ const authSlice = createSlice({
 
     //register
     registerRequest(state, _action: PayloadAction<IRegisterPayload>) {
+      void _action;
       state.loading = true;
       state.error = null; // clear lỗi cũ
     },

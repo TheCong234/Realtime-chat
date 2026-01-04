@@ -1,0 +1,41 @@
+
+> realtime-chat@0.1.0 build
+> next build --turbopack
+
+   ▲ Next.js 15.5.2 (Turbopack)
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Finished writing to disk in 361ms
+ ✓ Compiled successfully in 3.0s
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/9) ...
+   Generating static pages (2/9) 
+   Generating static pages (4/9) 
+   Generating static pages (6/9) 
+ ✓ Generating static pages (9/9)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                         Size  First Load JS
+┌ ○ /                                0 B         285 kB
+├ ○ /_not-found                      0 B         176 kB
+├ ○ /forgot-password               18 kB         201 kB
+├ ○ /login                       33.6 kB         209 kB
+├ ƒ /messenger/[id]              10.5 kB         295 kB
+├ ○ /new-chat                    14.5 kB         299 kB
+└ ○ /register                    14.2 kB         215 kB
++ First Load JS shared by all     189 kB
+  ├ chunks/2008ffcf9e5b170c.js     13 kB
+  ├ chunks/3cb8f74b45d295ac.js   19.3 kB
+  ├ chunks/8082ab48faca5ea1.js   17.2 kB
+  ├ chunks/c19da6693934fea1.js   59.2 kB
+  ├ chunks/e16d5fbba0e7cfbd.js   28.9 kB
+  ├ chunks/48a71561f9744ea7.css  13.9 kB
+  └ other shared chunks (total)  38.1 kB
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

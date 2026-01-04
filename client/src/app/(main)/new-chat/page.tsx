@@ -8,6 +8,7 @@ import { messageService } from "@/features/messages/message.service";
 import { fetchConversations } from "@/features/conversations/conversation.slice";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import { AxiosError } from "axios";
 
 const NewChatPage = () => {
   const dispatch = useDispatch();
@@ -38,8 +39,10 @@ const NewChatPage = () => {
       dispatch(fetchConversations());
 
       setSelectedUsers([]);
-    } catch (error: any) {
-      toast.error(error.message || "Không thể gửi tin nhắn");
+    } catch (error) {
+      const err = error as AxiosError<{ message: string }>;
+      const message = err.response?.data?.message || err.message || "Không thể gửi tin nhắn";
+      toast.error(message);
     } finally {
       setIsSending(false);
     }

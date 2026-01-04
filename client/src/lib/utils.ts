@@ -1,4 +1,3 @@
-import { IUser } from "@/features/user/user.types";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -63,4 +62,17 @@ export const getUserInitials = ({ fullName, username }: IUserInitials) => {
       .slice(0, 2);
   }
   return username.slice(0, 2).toUpperCase();
+};
+
+//error
+import { AxiosError } from "axios";
+
+export const getErrorMessage = (error: unknown): string => {
+  if (error instanceof AxiosError) {
+    return error.response?.data?.message || error.message;
+  }
+  if (error instanceof Error) {
+    return error.message;
+  }
+  return "Đã có lỗi xảy ra";
 };

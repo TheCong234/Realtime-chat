@@ -13,6 +13,7 @@ import { userService } from "@/features/user/user.service";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { AxiosError } from "axios";
 
 const MAX_RECIPIENTS = 20;
 
@@ -45,8 +46,9 @@ export function ReceipientsAutocomplete({
       try {
         const response = await userService.getPagedUsers(1, 20, debouncedQuery || undefined);
         setUsers(response.data.items);
-      } catch (error: any) {
-        toast.error(error.message || "Không thể tải danh sách người dùng");
+      } catch (error) {
+        const err = error as AxiosError<{ message: string }>;
+        toast.error(err.response?.data?.message || "Không thể tải danh sách người dùng");
         setUsers([]);
       } finally {
         setLoading(false);

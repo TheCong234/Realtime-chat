@@ -48,7 +48,7 @@ const conversationSlice = createSlice({
     },
 
     //get conversation details
-    fetchConversationDetails(state, action: PayloadAction<string>) {
+    fetchConversationDetails(state, _action: PayloadAction<string>) {
       state.loading = true;
     },
     fetchConversationDetailsSuccess(state, action: PayloadAction<IConversation>) {
@@ -60,7 +60,7 @@ const conversationSlice = createSlice({
     },
 
     // Clear conversation history
-    clearHistory(state, action: PayloadAction<string>) {
+    clearHistory(state, _action: PayloadAction<string>) {
       state.loading = true;
     },
     clearHistorySuccess(state, action: PayloadAction<string>) {
