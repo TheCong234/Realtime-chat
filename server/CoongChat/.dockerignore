@@ -1,0 +1,22 @@
+# Build outputs
+**/bin/
+**/obj/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Git
+.git
+.gitignore
+
+# Documentation
+*.md
+
+# Logs
+*.log
+
+# Local settings
+appsettings.Development.json
