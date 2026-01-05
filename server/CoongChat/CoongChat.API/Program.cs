@@ -178,6 +178,11 @@ namespace CoongChat.API
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+            using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
             app.UseStaticFiles(); // Serve uploaded files from wwwroot
             app.UseMiddleware<ExceptionHandlingMiddleware>();

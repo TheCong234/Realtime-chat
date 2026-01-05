@@ -61,7 +61,7 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5053}
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://164.152.167.138:5053}
     container_name: coongchat-frontend
     environment:
       - NODE_ENV=production
