@@ -11,6 +11,12 @@ export function createConnection(accessToken: string): signalR.HubConnection {
     return connection;
   }
 
+  // Validate HUB_URL before creating connection
+  if (!HUB_URL || HUB_URL === "/hubs/chat") {
+    console.error("SignalR: HUB_URL is not configured. Check NEXT_PUBLIC_API_URL environment variable.");
+    throw new Error("SignalR: HUB_URL is not configured.");
+  }
+
   console.log("SignalR: Creating connection to", HUB_URL);
 
   connection = new signalR.HubConnectionBuilder()
