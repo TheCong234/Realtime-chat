@@ -62,8 +62,11 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
 
             var messageDto = _mapper.Map<MessageDto>(message);
 
-            // Get all member userIds and broadcast message to them via SignalR
-            var memberUserIds = conversation.Members.Select(m => m.UserId).ToList();
+            // Get all member userIds except the sender and broadcast message to them via SignalR
+            var memberUserIds = conversation.Members
+                .Where(m => m.UserId != request.CurrentUserId)
+                .Select(m => m.UserId)
+                .ToList();
 
             await _chatNotificationService.SendMessageToUsersAsync(
                 memberUserIds,

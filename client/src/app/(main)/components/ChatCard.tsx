@@ -11,6 +11,7 @@ import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { UserStatus } from "@/constants/enum";
+import { useSidebar } from "@/components/ui/sidebar";
 
 interface IChatCardProps {
   name: string;
@@ -32,12 +33,21 @@ export function ChatCard({
   const pathname = usePathname();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { currentUser } = useSelector((state: RootState) => state.user);
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const isActive = pathname === `/messenger/${conversationId}`;
+
+  // Close sidebar on mobile when clicking a conversation
+  const handleClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   return (
     <div className="group/chatcard relative">
       <Link
+        onClick={handleClick}
         className={cn(
           "flex cursor-pointer items-center gap-3 rounded-lg p-1 transition-colors",
           "hover:bg-accent",

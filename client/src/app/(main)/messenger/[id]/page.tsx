@@ -170,7 +170,13 @@ const ChatPage = () => {
   /** ================= RENDER ================= */
   return (
     <div className="flex h-full gap-4">
-      <div className="flex h-full flex-1 flex-col overflow-hidden rounded-xl bg-white shadow-xl">
+      {/* Main chat area - hide on mobile when info panel is open */}
+      <div
+        className={cn(
+          "dark:bg-card flex h-full flex-1 flex-col overflow-hidden rounded-xl bg-white shadow-xl",
+          showInfo && "hidden md:flex",
+        )}
+      >
         <Toolbar
           name={toolbarInfo.name}
           avatar={toolbarInfo.avatar}
@@ -207,9 +213,20 @@ const ChatPage = () => {
         <Footer />
       </div>
 
-      <div className={cn("hidden", showInfo && "block", "transition-all sm:w-full md:w-1/2 lg:w-1/3")}>
-        <RecipientInfo />
-      </div>
+      {/* RecipientInfo Panel */}
+      {showInfo && (
+        <>
+          {/* Mobile: Fullscreen overlay */}
+          <div className="bg-background fixed inset-0 z-50 md:hidden">
+            <RecipientInfo onClose={() => setShowInfo(false)} />
+          </div>
+
+          {/* Desktop: Side panel */}
+          <div className="hidden transition-all md:block md:w-1/2 lg:w-1/3">
+            <RecipientInfo onClose={() => setShowInfo(false)} />
+          </div>
+        </>
+      )}
     </div>
   );
 };

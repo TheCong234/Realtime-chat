@@ -1,20 +1,33 @@
 "use client";
 import { IconButtonTooltip } from "@/components/IconButtonTooltip";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BellIcon, CircleUserRoundIcon, SearchIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowLeftIcon, BellIcon, CircleUserRoundIcon, SearchIcon } from "lucide-react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
-const RecipientInfo = () => {
+interface IRecipientInfoProps {
+  onClose: () => void;
+}
+
+const RecipientInfo = ({ onClose }: IRecipientInfoProps) => {
   const [open, setOpen] = useState<boolean[]>([false, false, false, false]);
   const toggle = (index: number) => {
     setOpen((prev) => prev.map((v, i) => (i === index ? !v : v)));
   };
   return (
-    <div className="h-full rounded-xl bg-white p-4">
-      <div>
+    <div className="dark:bg-card flex h-full flex-col rounded-xl bg-white">
+      {/* Mobile header with back button - only visible on mobile */}
+      <header className="flex shrink-0 items-center gap-2 border-b p-3 md:hidden">
+        <Button variant="ghost" size="icon" onClick={onClose} className="shrink-0">
+          <ArrowLeftIcon className="size-5" />
+        </Button>
+        <span className="font-semibold">Thông tin về cuộc trò chuyện</span>
+      </header>
+
+      <div className="flex-1 overflow-y-auto p-4">
         <div className="flex flex-col items-center gap-2">
           <Avatar className="size-24">
             <AvatarImage src="/assets/images/no-avatar.png" />
