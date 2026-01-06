@@ -7,10 +7,12 @@ services:
     container_name: coongchat-db
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=${SA_PASSWORD:-YourStrong!Passw0rd123}
+      - SA_PASSWORD=${SA_PASSWORD}
       - MSSQL_PID=${MSSQL_PID:-Express}
-    ports:
-      - "1433:1433"
+    # SECURITY: Do NOT expose port 1433 to internet
+    # Only internal Docker network access
+    expose:
+      - "1433"
     volumes:
       - sqlserver_data:/var/opt/mssql
     networks:
@@ -30,16 +32,19 @@ services:
       dockerfile: Dockerfile
     container_name: coongchat-backend
     environment:
-      - ConnectionStrings__DefaultConnection=Server=db;Database=CoongChatDB;User Id=sa;Password=${SA_PASSWORD:-YourStrong!Passw0rd123};TrustServerCertificate=True
-      - Jwt__Key=${JWT_KEY:-COONGCHAT_SUPER_SECRET_KEY_123456789_DOCKER}
+      - ConnectionStrings__DefaultConnection=Server=db;Database=CoongChatDB;User Id=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+      - Jwt__Key=${JWT_KEY}
       - Jwt__Issuer=${JWT_ISSUER:-coongchat.api}
       - Jwt__Audience=${JWT_AUDIENCE:-coongchat.client}
       - Jwt__AccessTokenMinutes=${JWT_ACCESS_TOKEN_MINUTES:-1440}
       - Jwt__RefreshTokenDays=${JWT_REFRESH_TOKEN_DAYS:-7}
       - FileStorage__UploadPath=wwwroot/uploads
       - ASPNETCORE_ENVIRONMENT=Production
-    ports:
-      - "5053:5053"
+      - AllowedOrigins__0=https://chat.cloverhand.click
+      - AllowedOrigins__1=http://localhost:3000
+    # SECURITY: Do NOT expose port 5053 to internet, only through Nginx
+    expose:
+      - "5053"
     volumes:
       - uploads_data:/app/wwwroot/uploads
     networks:
@@ -61,17 +66,45 @@ services:
       context: ./client
       dockerfile: Dockerfile
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://164.152.167.138:5053}
+        - NEXT_PUBLIC_API_URL=https://chat.cloverhand.click
     container_name: coongchat-frontend
     environment:
       - NODE_ENV=production
-    ports:
-      - "3001:3000"
+    # SECURITY: Do NOT expose port 3000 to internet, only through Nginx
+    expose:
+      - "3000"
     networks:
       - coongchat-network
     depends_on:
       - backend
     restart: unless-stopped
+
+  # Nginx Reverse Proxy with SSL
+  nginx:
+    image: nginx:alpine
+    container_name: coongchat-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/conf:/etc/letsencrypt:ro
+      - ./certbot/www:/var/www/certbot:ro
+    networks:
+      - coongchat-network
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+
+  # Certbot for SSL certificates
+  certbot:
+    image: certbot/certbot
+    container_name: coongchat-certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
 
 networks:
   coongchat-network:

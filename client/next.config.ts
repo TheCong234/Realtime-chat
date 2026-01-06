@@ -15,7 +15,12 @@ const nextConfig: NextConfig = {
         protocol: "http",
         hostname: "164.152.167.138",
         port: "5053",
-        pathname: "/uploads/**", // VPS production
+        pathname: "/uploads/**", // VPS production (direct IP)
+      },
+      {
+        protocol: "https",
+        hostname: "chat.cloverhand.click",
+        pathname: "/uploads/**", // Production domain with HTTPS
       },
     ],
   },
