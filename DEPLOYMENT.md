@@ -1,216 +1,126 @@
-# 🚀 Hướng Dẫn Docker Deployment
+# 🚀 Hướng Dẫn Docker Deployment với HTTPS
 
-Hướng dẫn chi tiết để deploy Realtime Chat Application lên VPS sử dụng Docker.
-
-## 📋 Yêu Cầu
+## Yêu Cầu
 
 - Docker Engine 20.10+
 - Docker Compose 2.0+
-- Tối thiểu 2GB RAM (khuyến nghị 4GB cho SQL Server)
-- 10GB disk space
+- Tối thiểu 4GB RAM
+- Domain đã trỏ về VPS IP
 
-## 🔧 Cài Đặt Nhanh
+## 🔧 Các Bước Deploy
 
-### 1. Clone Repository
+### 1. Clone và cấu hình
 
 ```bash
 git clone https://github.com/your-repo/realtime-chat.git
 cd realtime-chat
-```
 
-### 2. Cấu Hình Environment
+# Tạo file .env từ template
+cp .env.production .env
 
-```bash
-# Copy file cấu hình mẫu
-cp .env.docker.example .env
-
-# Chỉnh sửa file .env với thông tin của bạn
+# QUAN TRỌNG: Đổi password và key!
 nano .env
 ```
 
-**Quan trọng:** Thay đổi các giá trị sau trong file `.env`:
-
-| Variable              | Mô tả                           | Ví dụ                                |
-| --------------------- | ------------------------------- | ------------------------------------ |
-| `SA_PASSWORD`         | Mật khẩu SQL Server (phải mạnh) | `YourStrong!Passw0rd123`             |
-| `JWT_KEY`             | Secret key cho JWT              | `your-super-secret-key-min-32-chars` |
-| `NEXT_PUBLIC_API_URL` | URL của backend API             | `http://your-domain.com:5053`        |
-
-### 3. Build và Chạy
+**Bắt buộc thay đổi trong `.env`:**
 
 ```bash
-# Build tất cả images
-docker-compose build
+# Tạo password SQL mạnh
+SA_PASSWORD=$(openssl rand -base64 24)
 
-# Chạy services (background mode)
+# Tạo JWT key mạnh
+JWT_KEY=$(openssl rand -base64 32)
+```
+
+### 2. Trỏ DNS
+
+Thêm A record:
+
+```
+chat.cloverhand.click → 164.152.167.138
+```
+
+### 3. Chạy script khởi tạo SSL
+
+```bash
+# Sửa email trong script
+nano init-ssl.sh
+
+# Chạy script
+chmod +x init-ssl.sh
+./init-ssl.sh
+```
+
+### Hoặc làm thủ công:
+
+```bash
+# Bước 1: Copy config HTTP tạm
+cp nginx/nginx-init.conf nginx/nginx.conf
+
+# Bước 2: Tạo thư mục cho Certbot
+mkdir -p certbot/conf certbot/www
+
+# Bước 3: Build và chạy
+docker-compose build
 docker-compose up -d
 
+# Bước 4: Lấy SSL Certificate
+docker-compose run --rm certbot certonly \
+    --webroot \
+    --webroot-path=/var/www/certbot \
+    --email your-email@example.com \
+    --agree-tos \
+    --no-eff-email \
+    -d chat.cloverhand.click
+
+# Bước 5: Copy config HTTPS
+# (file nginx/nginx.conf gốc đã có cấu hình SSL)
+
+# Bước 6: Reload Nginx
+docker-compose exec nginx nginx -s reload
+```
+
+## 🌐 Truy Cập
+
+| Service     | URL                                   |
+| ----------- | ------------------------------------- |
+| Frontend    | https://chat.cloverhand.click         |
+| Backend API | https://chat.cloverhand.click/api     |
+| SignalR Hub | wss://chat.cloverhand.click/hubs/chat |
+
+## 🔒 Bảo Mật Đã Áp Dụng
+
+- ✅ SQL Server không expose ra internet
+- ✅ Backend API chỉ truy cập qua Nginx
+- ✅ HTTPS với Let's Encrypt SSL
+- ✅ Security headers (X-Frame-Options, etc.)
+- ✅ Non-root user trong containers
+
+## 🔄 Các Lệnh Hữu Ích
+
+```bash
 # Xem logs
 docker-compose logs -f
-```
 
-### 4. Kiểm Tra Trạng Thái
+# Restart tất cả
+docker-compose restart
 
-```bash
-# Xem status của containers
-docker-compose ps
+# Rebuild một service
+docker-compose build frontend
+docker-compose up -d frontend
 
-# Kiểm tra health của backend
-curl http://localhost:5053/health
-```
-
-## 🌐 Truy Cập Services
-
-| Service     | URL                           | Mô tả                   |
-| ----------- | ----------------------------- | ----------------------- |
-| Frontend    | http://localhost:3000         | Giao diện người dùng    |
-| Backend API | http://localhost:5053         | REST API                |
-| Swagger     | http://localhost:5053/swagger | API Documentation       |
-| SQL Server  | localhost:1433                | Database (chỉ internal) |
-
-## 🔒 Cấu Hình Production
-
-### Sử Dụng Nginx Reverse Proxy
-
-Tạo file `nginx.conf`:
-
-```nginx
-server {
-    listen 80;
-    server_name your-domain.com;
-
-    # Frontend
-    location / {
-        proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # Backend API
-    location /api {
-        proxy_pass http://localhost:5053;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-
-    # SignalR Hub
-    location /hubs {
-        proxy_pass http://localhost:5053;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-    }
-}
-```
-
-### SSL/HTTPS với Certbot
-
-```bash
-# Cài đặt certbot
-sudo apt install certbot python3-certbot-nginx
-
-# Tạo certificate
-sudo certbot --nginx -d your-domain.com
-```
-
-## 🛠️ Các Lệnh Hữu Ích
-
-```bash
-# Dừng tất cả services
-docker-compose down
-
-# Dừng và xóa volumes (CẢNH BÁO: xóa dữ liệu)
-docker-compose down -v
-
-# Rebuild một service cụ thể
-docker-compose build backend
-docker-compose up -d backend
-
-# Xem logs của một service
-docker-compose logs -f backend
-
-# Truy cập shell của container
-docker-compose exec backend bash
-docker-compose exec db /bin/bash
-
-# Kết nối SQL Server
-docker-compose exec db /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourPassword' -C
-```
-
-## 📊 Database Migration
-
-Để chạy Entity Framework migrations trong Docker:
-
-```bash
-# Truy cập container backend
-docker-compose exec backend bash
-
-# Hoặc chạy migration từ local với connection string tới Docker
-dotnet ef database update --connection "Server=localhost,1433;Database=CoongChatDB;User Id=sa;Password=YourPassword;TrustServerCertificate=True"
-```
-
-## 🔄 Cập Nhật Ứng Dụng
-
-```bash
-# Pull code mới
-git pull origin main
-
-# Rebuild và restart
-docker-compose build
-docker-compose up -d
+# Gia hạn SSL (tự động bởi certbot container)
+docker-compose run --rm certbot renew
 ```
 
 ## ❗ Troubleshooting
 
-### SQL Server không khởi động
+### SSL không hoạt động
 
-- Kiểm tra password đủ mạnh (ít nhất 8 ký tự, có chữ hoa, chữ thường, số, ký tự đặc biệt)
-- Kiểm tra RAM >= 2GB
-- Xem logs: `docker-compose logs db`
+- Kiểm tra DNS đã propagate: `nslookup chat.cloverhand.click`
+- Kiểm tra firewall mở port 80, 443
 
-### Backend không kết nối được database
+### WebSocket không kết nối
 
-- Đợi SQL Server healthy (khoảng 30-60 giây sau khi start)
-- Kiểm tra connection string trong file `.env`
-- Xem logs: `docker-compose logs backend`
-
-### Frontend không kết nối được backend
-
-- Kiểm tra `NEXT_PUBLIC_API_URL` trong file `.env`
-- Đảm bảo backend đã chạy và healthy
-- Kiểm tra CORS configuration
-
-### Xóa và tạo lại từ đầu
-
-```bash
-docker-compose down -v
-docker system prune -a
-docker-compose build --no-cache
-docker-compose up -d
-```
-
-## 📁 Cấu Trúc Volumes
-
-| Volume           | Đường dẫn Container    | Mô tả              |
-| ---------------- | ---------------------- | ------------------ |
-| `sqlserver_data` | `/var/opt/mssql`       | Dữ liệu SQL Server |
-| `uploads_data`   | `/app/wwwroot/uploads` | File uploads       |
-
-## 🔐 Bảo Mật
-
-1. **Thay đổi mật khẩu mặc định** - Không sử dụng mật khẩu trong file example
-2. **Sử dụng HTTPS** - Cấu hình SSL certificate cho production
-3. **Firewall** - Chỉ mở ports cần thiết (80, 443)
-4. **Backup định kỳ** - Sao lưu database và uploads
-
-## 📞 Hỗ Trợ
-
-Nếu gặp vấn đề, vui lòng tạo issue trên GitHub repository.
+- Kiểm tra Nginx config có `proxy_set_header Upgrade`
+- Xem logs: `docker-compose logs nginx`
