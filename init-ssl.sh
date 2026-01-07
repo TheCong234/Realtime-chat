@@ -16,13 +16,13 @@ echo "=== Bước 2: Tạo thư mục cho Certbot ==="
 mkdir -p certbot/conf certbot/www
 
 echo "=== Bước 3: Khởi động services ==="
-docker-compose up -d db backend frontend nginx
+docker compose up -d db backend frontend nginx
 
 echo "=== Bước 4: Đợi services khởi động (30s) ==="
 sleep 30
 
 echo "=== Bước 5: Lấy SSL Certificate ==="
-docker-compose run --rm certbot certonly \
+docker compose run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
     --email $EMAIL \
@@ -106,7 +106,7 @@ server {
 NGINX_CONF
 
 echo "=== Bước 7: Reload Nginx với SSL ==="
-docker-compose exec nginx nginx -s reload
+docker compose exec nginx nginx -s reload
 
 echo "=== HOÀN TẤT! ==="
 echo "Truy cập: https://chat.cloverhand.click"
