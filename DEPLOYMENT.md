@@ -61,14 +61,14 @@ cp nginx/nginx-init.conf nginx/nginx.conf
 mkdir -p certbot/conf certbot/www
 
 # Bước 3: Build và chạy
-docker-compose build
-docker-compose up -d
+docker compose build
+docker compose up -d
 
 # Bước 4: Lấy SSL Certificate
-docker-compose run --rm certbot certonly \
+docker compose run --rm certbot certonly \
     --webroot \
     --webroot-path=/var/www/certbot \
-    --email your-email@example.com \
+    --email tranthecong99@gmail.com \
     --agree-tos \
     --no-eff-email \
     -d chat.cloverhand.click
@@ -77,7 +77,7 @@ docker-compose run --rm certbot certonly \
 # (file nginx/nginx.conf gốc đã có cấu hình SSL)
 
 # Bước 6: Reload Nginx
-docker-compose exec nginx nginx -s reload
+docker compose exec nginx nginx -s reload
 ```
 
 ## 🌐 Truy Cập
@@ -100,17 +100,17 @@ docker-compose exec nginx nginx -s reload
 
 ```bash
 # Xem logs
-docker-compose logs -f
+docker compose logs -f
 
 # Restart tất cả
-docker-compose restart
+docker compose restart
 
 # Rebuild một service
-docker-compose build frontend
-docker-compose up -d frontend
+docker compose build frontend
+docker compose up -d frontend
 
 # Gia hạn SSL (tự động bởi certbot container)
-docker-compose run --rm certbot renew
+docker compose run --rm certbot renew
 ```
 
 ## ❗ Troubleshooting
@@ -123,4 +123,4 @@ docker-compose run --rm certbot renew
 ### WebSocket không kết nối
 
 - Kiểm tra Nginx config có `proxy_set_header Upgrade`
-- Xem logs: `docker-compose logs nginx`
+- Xem logs: `docker compose logs nginx`
