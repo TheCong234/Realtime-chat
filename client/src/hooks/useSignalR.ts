@@ -13,7 +13,13 @@ import {
   HubConnectionState,
 } from "@/lib/signalr";
 import { setUserStatus, setOnlineUsers } from "@/features/user/user.slice";
-import { receiveMessage, updateMessageStatus, messageRecalled, markAllAsSeen } from "@/features/messages/message.slice";
+import {
+  receiveMessage,
+  updateMessageStatus,
+  messageRecalled,
+  markAllAsSeen,
+  markAllAsDelivered,
+} from "@/features/messages/message.slice";
 import { upsertConversationWithMessage } from "@/features/conversations/conversation.slice";
 import { UserStatus, MessageReadStatus } from "@/constants/enum";
 import type { IMessage } from "@/features/messages/message.type";
@@ -39,6 +45,12 @@ interface IConversationSeenEvent {
 interface IMessageRecalledEvent {
   conversationId: string;
   messageId: string;
+}
+
+interface IConversationDeliveredEvent {
+  conversationId: string;
+  userId: string;
+  status: MessageReadStatus;
 }
 
 export function useSignalR() {
@@ -111,6 +123,14 @@ export function useSignalR() {
     [dispatch],
   );
 
+  const handleConversationDelivered = useCallback(
+    (data: IConversationDeliveredEvent) => {
+      console.log("SignalR: ConversationDelivered", data);
+      dispatch(markAllAsDelivered({ conversationId: data.conversationId, userId: data.userId }));
+    },
+    [dispatch],
+  );
+
   const connect = useCallback(async () => {
     if (!accessToken || isConnectedRef.current) return;
 
@@ -135,6 +155,7 @@ export function useSignalR() {
       });
       on("MessageStatusChanged", handleMessageStatusChanged);
       on("ConversationSeen", handleConversationSeen);
+      on("ConversationDelivered", handleConversationDelivered);
       on("MessageRecalled", handleMessageRecalled);
 
       // Fetch initial online users
@@ -162,6 +183,7 @@ export function useSignalR() {
     handleReceiveMessage,
     handleMessageStatusChanged,
     handleConversationSeen,
+    handleConversationDelivered,
     handleMessageRecalled,
   ]);
 
@@ -173,6 +195,7 @@ export function useSignalR() {
     off("ReceiveMessage");
     off("MessageStatusChanged");
     off("ConversationSeen");
+    off("ConversationDelivered");
     off("MessageRecalled");
 
     await stopConnection();

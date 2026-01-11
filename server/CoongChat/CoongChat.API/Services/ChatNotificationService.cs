@@ -2,6 +2,7 @@ using CoongChat.API.Hubs;
 using CoongChat.Application.Features.Conversations.Dto;
 using CoongChat.Application.Features.Messages.Dto;
 using CoongChat.Application.Interfaces;
+using CoongChat.Domain.Common;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoongChat.API.Services
@@ -13,30 +14,64 @@ namespace CoongChat.API.Services
     {
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IUserConnectionRepository _userConnectionRepository;
+        private readonly IMessageStatusRepository _messageStatusRepository;
 
         public ChatNotificationService(
             IHubContext<ChatHub> hubContext,
-            IUserConnectionRepository userConnectionRepository)
+            IUserConnectionRepository userConnectionRepository,
+            IMessageStatusRepository messageStatusRepository)
         {
             _hubContext = hubContext;
             _userConnectionRepository = userConnectionRepository;
+            _messageStatusRepository = messageStatusRepository;
         }
 
         public async Task SendMessageToUsersAsync(List<Guid> userIds, ConversationDto conversation, MessageDto message, CancellationToken ct = default)
         {
-            // Get all connection IDs for the target users
+            // Get all connection IDs for the target users and track online users
             var connectionIds = new List<string>();
+            var onlineUserIds = new List<Guid>();
+            
             foreach (var userId in userIds)
             {
                 var userConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(userId, ct);
-                connectionIds.AddRange(userConnections);
+                if (userConnections.Count > 0)
+                {
+                    connectionIds.AddRange(userConnections);
+                    onlineUserIds.Add(userId);
+                }
             }
 
             if (connectionIds.Count > 0)
             {
+                // Send message to online users
                 await _hubContext.Clients
                     .Clients(connectionIds)
                     .SendAsync("ReceiveMessage", conversation, message, ct);
+
+                // Mark message as Delivered for online recipients
+                foreach (var onlineUserId in onlineUserIds)
+                {
+                    await _messageStatusRepository.UpdateStatusAsync(
+                        message.Id,
+                        onlineUserId,
+                        MessageReadStatus.Delivered,
+                        ct);
+                }
+
+                // Notify sender about delivery status
+                var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(message.SenderId, ct);
+                if (senderConnections.Count > 0)
+                {
+                    await _hubContext.Clients
+                        .Clients(senderConnections)
+                        .SendAsync("ConversationDelivered", new
+                        {
+                            ConversationId = conversation.Id,
+                            UserId = onlineUserIds.First(), // Any online user
+                            Status = (int)MessageReadStatus.Delivered
+                        }, ct);
+                }
             }
         }
 

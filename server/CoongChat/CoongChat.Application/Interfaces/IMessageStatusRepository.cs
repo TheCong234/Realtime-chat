@@ -15,5 +15,13 @@ namespace CoongChat.Application.Interfaces
         Task<List<MessageStatus>> GetStatusesByMessageIdAsync(Guid messageId, CancellationToken ct = default);
         Task RecallMessageAsync(Guid messageId, CancellationToken ct = default);
         Task<MessageReadStatus> GetAggregatedStatusAsync(Guid messageId, Guid? viewerUserId, Guid senderId, CancellationToken ct = default);
+        
+        /// <summary>
+        /// Marks all messages sent to the specified user as Delivered and returns sender information.
+        /// </summary>
+        /// <param name="userId">The recipient user ID</param>
+        /// <param name="ct">Cancellation token</param>
+        /// <returns>Dictionary with conversationId as key and list of sender IDs as value</returns>
+        Task<Dictionary<Guid, List<Guid>>> MarkAllAsDeliveredForUserAndGetSendersAsync(Guid userId, CancellationToken ct = default);
     }
 }

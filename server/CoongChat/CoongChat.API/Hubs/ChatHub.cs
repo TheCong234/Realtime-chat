@@ -14,17 +14,20 @@ namespace CoongChat.API.Hubs
         private readonly IUserRepository _userRepository;
         private readonly IConversationRepository _conversationRepository;
         private readonly IMessageStatusRepository _messageStatusRepository;
+        private readonly ILogger<ChatHub> _logger;
 
         public ChatHub(
             IUserConnectionRepository userConnectionRepository,
             IUserRepository userRepository,
             IConversationRepository conversationRepository,
-            IMessageStatusRepository messageStatusRepository)
+            IMessageStatusRepository messageStatusRepository,
+            ILogger<ChatHub> logger)
         {
             _userConnectionRepository = userConnectionRepository;
             _userRepository = userRepository;
             _conversationRepository = conversationRepository;
             _messageStatusRepository = messageStatusRepository;
+            _logger = logger;
         }
 
         private Guid GetUserId()
@@ -57,6 +60,28 @@ namespace CoongChat.API.Hubs
                 UserId = userId,
                 Status = (int)UserStatus.Online
             });
+
+            // Mark all pending messages to this user as Delivered and notify senders
+            _logger.LogInformation("User {UserId} connected, marking messages as delivered...", userId);
+            var deliveredInfo = await _messageStatusRepository.MarkAllAsDeliveredForUserAndGetSendersAsync(userId);
+            _logger.LogInformation("Marked messages in {Count} conversations as delivered for user {UserId}", deliveredInfo.Count, userId);
+
+            foreach (var (conversationId, senderIds) in deliveredInfo)
+            {
+                foreach (var senderId in senderIds)
+                {
+                    var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(senderId);
+                    if (senderConnections.Count > 0)
+                    {
+                        await Clients.Clients(senderConnections).SendAsync("ConversationDelivered", new
+                        {
+                            ConversationId = conversationId,
+                            UserId = userId,
+                            Status = (int)MessageReadStatus.Delivered
+                        });
+                    }
+                }
+            }
 
             await base.OnConnectedAsync();
         }

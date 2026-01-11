@@ -169,5 +169,31 @@ namespace CoongChat.Infrastructure.Repositories
             var viewerStatus = statuses.FirstOrDefault(s => s.UserId == viewerUserId);
             return viewerStatus?.Status ?? MessageReadStatus.Sent;
         }
+
+        public async Task<Dictionary<Guid, List<Guid>>> MarkAllAsDeliveredForUserAndGetSendersAsync(Guid userId, CancellationToken ct = default)
+        {
+            var messageStatuses = await _context.MessageStates
+                .Include(ms => ms.Message)
+                .Where(ms => ms.UserId == userId && ms.Status == MessageReadStatus.Sent)
+                .ToListAsync(ct);
+
+            // Group by conversationId and get unique sender IDs
+            var result = messageStatuses
+                .GroupBy(ms => ms.Message.ConversationId)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.Select(ms => ms.Message.SenderId).Distinct().ToList()
+                );
+
+            foreach (var status in messageStatuses)
+            {
+                status.Status = MessageReadStatus.Delivered;
+                status.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync(ct);
+
+            return result;
+        }
     }
 }

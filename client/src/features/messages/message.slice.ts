@@ -109,6 +109,20 @@ const messageSlice = createSlice({
         }
       });
     },
+    // Mark all messages in conversation as delivered (sender's perspective when recipient comes online)
+    markAllAsDelivered(state, action: PayloadAction<{ conversationId: string; userId: string }>) {
+      state.messages.forEach((m) => {
+        // Update messages sent by the current user (sender) to the user who just came online
+        // Only update if current status is Sent
+        if (
+          m.conversationId === action.payload.conversationId &&
+          m.senderId !== action.payload.userId &&
+          m.status === MessageReadStatus.Sent
+        ) {
+          m.status = MessageReadStatus.Delivered;
+        }
+      });
+    },
 
     // Recall Message Actions
     recallMessage(state, _action: PayloadAction<IRecallMessagePayload>) {
@@ -155,6 +169,7 @@ export const {
   receiveMessage,
   updateMessageStatus,
   markAllAsSeen,
+  markAllAsDelivered,
   addOptimisticMessage,
   recallMessage,
   recallMessageSuccess,

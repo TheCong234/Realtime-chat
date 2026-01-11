@@ -25,6 +25,7 @@ namespace CoongChat.Infrastructure.Repositories
         {
             var query = _context.Messages
                 .Include(m => m.Sender)
+                .Include(m => m.Statuses)
                 .Where(m => m.ConversationId == conversationId)
                 .AsQueryable();
 
