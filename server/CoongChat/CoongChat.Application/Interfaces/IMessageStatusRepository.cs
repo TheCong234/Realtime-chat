@@ -11,6 +11,9 @@ namespace CoongChat.Application.Interfaces
         Task CreateForRecipientsAsync(Guid messageId, List<Guid> recipientIds, CancellationToken ct = default);
         Task MarkAllAsDeliveredAsync(Guid userId, Guid conversationId, CancellationToken ct = default);
         Task MarkAllAsSeenAsync(Guid userId, Guid conversationId, CancellationToken ct = default);
+        Task<List<Guid>> MarkAllAsSeenAndGetSenderIdsAsync(Guid userId, Guid conversationId, CancellationToken ct = default);
         Task<List<MessageStatus>> GetStatusesByMessageIdAsync(Guid messageId, CancellationToken ct = default);
+        Task RecallMessageAsync(Guid messageId, CancellationToken ct = default);
+        Task<MessageReadStatus> GetAggregatedStatusAsync(Guid messageId, Guid? viewerUserId, Guid senderId, CancellationToken ct = default);
     }
 }

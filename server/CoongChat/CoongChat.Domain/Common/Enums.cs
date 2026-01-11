@@ -37,7 +37,8 @@ namespace CoongChat.Domain.Common
     {
         Sent,
         Delivered,
-        Seen
+        Seen,
+        Recalled
     }
 
     public enum NotificationType

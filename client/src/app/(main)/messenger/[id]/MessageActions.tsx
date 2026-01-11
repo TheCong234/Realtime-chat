@@ -1,13 +1,32 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
-import { Smile, Forward, EllipsisVertical } from "lucide-react";
+import { Smile, Forward, EllipsisVertical, Undo2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useDispatch } from "react-redux";
+import { recallMessage } from "@/features/messages/message.slice";
 
-export function MessageActions() {
+interface IMessageActionsProps {
+  messageId: string;
+  isOwner: boolean;
+  isDeleted?: boolean;
+}
+
+export function MessageActions({ messageId, isOwner, isDeleted }: IMessageActionsProps) {
+  const dispatch = useDispatch();
+
+  const handleRecall = () => {
+    dispatch(recallMessage({ messageId }));
+  };
+
+  // Don't show actions for recalled messages
+  if (isDeleted) return null;
+
   return (
     <div className="bg-background flex items-center gap-1 rounded-full px-1 shadow">
       {/* Emoji */}
@@ -31,6 +50,12 @@ export function MessageActions() {
         <DropdownMenuContent align="end">
           <DropdownMenuItem>Trả lời</DropdownMenuItem>
           <DropdownMenuItem>Sao chép</DropdownMenuItem>
+          {isOwner && (
+            <DropdownMenuItem onClick={handleRecall}>
+              <Undo2 className="mr-2 size-4" />
+              Thu hồi
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem className="text-destructive">Xóa</DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

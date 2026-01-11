@@ -15,6 +15,7 @@ export const MESSAGE_API = {
   GET_BY_CONVERSATION_ID: `${apiVersion}/Message/Conversation`,
   SEND: `${apiVersion}/Message`,
   BROADCAST: `${apiVersion}/Message/Broadcast`,
+  RECALL: (id: string) => `${apiVersion}/Message/${id}/Recall`,
 };
 
 export const USER_API = {

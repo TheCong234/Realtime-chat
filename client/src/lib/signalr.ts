@@ -149,6 +149,13 @@ export async function markConversationAsSeen(conversationId: string): Promise<vo
 }
 
 /**
+ * Marks a specific message as delivered
+ */
+export async function markMessageDelivered(messageId: string): Promise<void> {
+  await invoke("MarkMessageDelivered", messageId);
+}
+
+/**
  * Gets list of online user IDs
  */
 export async function getOnlineUsers(): Promise<string[]> {

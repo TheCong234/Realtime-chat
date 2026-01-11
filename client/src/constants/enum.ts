@@ -28,9 +28,11 @@ export enum MessageType {
 }
 
 export enum MessageReadStatus {
+  Sending = -1,
   Sent = 0,
   Delivered = 1,
   Seen = 2,
+  Recalled = 3,
 }
 
 export enum NotificationType {

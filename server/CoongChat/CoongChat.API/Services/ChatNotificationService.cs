@@ -62,6 +62,27 @@ namespace CoongChat.API.Services
                     }, ct);
             }
         }
+
+        public async Task NotifyMessageRecalledAsync(List<Guid> userIds, Guid conversationId, Guid messageId, CancellationToken ct = default)
+        {
+            var connectionIds = new List<string>();
+            foreach (var userId in userIds)
+            {
+                var userConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(userId, ct);
+                connectionIds.AddRange(userConnections);
+            }
+
+            if (connectionIds.Count > 0)
+            {
+                await _hubContext.Clients
+                    .Clients(connectionIds)
+                    .SendAsync("MessageRecalled", new
+                    {
+                        ConversationId = conversationId,
+                        MessageId = messageId
+                    }, ct);
+            }
+        }
     }
 }
 

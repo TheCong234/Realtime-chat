@@ -30,4 +30,10 @@ export const messageService = {
       headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
     });
   },
+  recallMessage: async (messageId: string): Promise<IBaseResponse<boolean>> => {
+    const url = MESSAGE_API.RECALL(messageId);
+    return axiosClient.post(url, null, {
+      headers: { Authorization: `Bearer ${localStorage.getItem("accessToken")}` },
+    });
+  },
 };

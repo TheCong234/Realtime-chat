@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 import { IMessage } from "@/features/messages/message.type";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { MessageType } from "@/constants/enum";
+import { MessageType, MessageReadStatus } from "@/constants/enum";
 import Image from "next/image";
 
 interface IProps {
@@ -11,11 +11,26 @@ interface IProps {
 
 export function MessageContent({ message }: IProps) {
   const { currentUser } = useSelector((state: RootState) => state.user);
+  const isOwner = message.senderId === currentUser?.id;
+  const isRecalled = message.isDeleted || message.status === MessageReadStatus.Recalled;
+
+  // Recalled message style
+  if (isRecalled) {
+    return (
+      <div
+        className={cn(
+          "text-muted-foreground rounded-2xl px-4 py-2 text-sm italic",
+          isOwner ? "rounded-br-md bg-blue-500/20" : "bg-muted/50 rounded-bl-md",
+        )}
+      >
+        Tin nhắn đã được thu hồi
+      </div>
+    );
+  }
+
   const baseClass = cn(
     "rounded-2xl px-4 py-2 text-sm break-words",
-    message.senderId === currentUser?.id
-      ? "bg-blue-500 text-white rounded-br-md"
-      : "bg-muted text-foreground rounded-bl-md",
+    isOwner ? "bg-blue-500 text-white rounded-br-md" : "bg-muted text-foreground rounded-bl-md",
   );
 
   if (message.type === MessageType.Image) {

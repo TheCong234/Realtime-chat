@@ -13,7 +13,7 @@ import {
   HubConnectionState,
 } from "@/lib/signalr";
 import { setUserStatus, setOnlineUsers } from "@/features/user/user.slice";
-import { receiveMessage, updateMessageStatus } from "@/features/messages/message.slice";
+import { receiveMessage, updateMessageStatus, messageRecalled, markAllAsSeen } from "@/features/messages/message.slice";
 import { upsertConversationWithMessage } from "@/features/conversations/conversation.slice";
 import { UserStatus, MessageReadStatus } from "@/constants/enum";
 import type { IMessage } from "@/features/messages/message.type";
@@ -34,6 +34,11 @@ interface IConversationSeenEvent {
   conversationId: string;
   userId: string;
   status: MessageReadStatus;
+}
+
+interface IMessageRecalledEvent {
+  conversationId: string;
+  messageId: string;
 }
 
 export function useSignalR() {
@@ -89,11 +94,22 @@ export function useSignalR() {
     [dispatch],
   );
 
-  const handleConversationSeen = useCallback((data: IConversationSeenEvent) => {
-    console.log("SignalR: ConversationSeen", data);
-    // This could trigger a refetch of messages or update local state
-    // For now, we'll handle it by emitting an update for UI purposes
-  }, []);
+  const handleConversationSeen = useCallback(
+    (data: IConversationSeenEvent) => {
+      console.log("SignalR: ConversationSeen", data);
+      // Update all messages in this conversation to Seen status (for sender's perspective)
+      dispatch(markAllAsSeen({ conversationId: data.conversationId, userId: data.userId }));
+    },
+    [dispatch],
+  );
+
+  const handleMessageRecalled = useCallback(
+    (data: IMessageRecalledEvent) => {
+      console.log("SignalR: MessageRecalled", data);
+      dispatch(messageRecalled({ messageId: data.messageId }));
+    },
+    [dispatch],
+  );
 
   const connect = useCallback(async () => {
     if (!accessToken || isConnectedRef.current) return;
@@ -119,6 +135,7 @@ export function useSignalR() {
       });
       on("MessageStatusChanged", handleMessageStatusChanged);
       on("ConversationSeen", handleConversationSeen);
+      on("MessageRecalled", handleMessageRecalled);
 
       // Fetch initial online users
       try {
@@ -145,6 +162,7 @@ export function useSignalR() {
     handleReceiveMessage,
     handleMessageStatusChanged,
     handleConversationSeen,
+    handleMessageRecalled,
   ]);
 
   const disconnect = useCallback(async () => {
@@ -155,6 +173,7 @@ export function useSignalR() {
     off("ReceiveMessage");
     off("MessageStatusChanged");
     off("ConversationSeen");
+    off("MessageRecalled");
 
     await stopConnection();
     isConnectedRef.current = false;

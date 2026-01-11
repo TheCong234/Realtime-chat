@@ -23,8 +23,9 @@ export interface IMessage {
   type: MessageType;
   content: string;
   createdAt: string;
+  isDeleted?: boolean;
   sender: IMessageSender;
-  status?: MessageReadStatus; // Optional: message delivery/read status
+  status?: MessageReadStatus;
 }
 
 export interface ISendMessagePayload {
@@ -37,4 +38,8 @@ export interface IBroadcastMessagePayload {
   userIds: string[];
   type: number;
   content: string;
+}
+
+export interface IRecallMessagePayload {
+  messageId: string;
 }

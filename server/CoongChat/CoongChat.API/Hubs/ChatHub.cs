@@ -141,15 +141,26 @@ namespace CoongChat.API.Hubs
         {
             var userId = GetUserId();
 
-            await _messageStatusRepository.MarkAllAsSeenAsync(userId, conversationId);
+            // Mark messages as seen and get sender IDs
+            var senderIds = await _messageStatusRepository.MarkAllAsSeenAndGetSenderIdsAsync(userId, conversationId);
 
-            // Notify all members in the conversation
-            await Clients.Group(conversationId.ToString()).SendAsync("ConversationSeen", new
+            if (senderIds.Count > 0)
             {
-                ConversationId = conversationId,
-                UserId = userId,
-                Status = (int)MessageReadStatus.Seen
-            });
+                // Notify each sender about the status change via their connections
+                foreach (var senderId in senderIds)
+                {
+                    var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(senderId);
+                    if (senderConnections.Count > 0)
+                    {
+                        await Clients.Clients(senderConnections).SendAsync("ConversationSeen", new
+                        {
+                            ConversationId = conversationId,
+                            UserId = userId,
+                            Status = (int)MessageReadStatus.Seen
+                        });
+                    }
+                }
+            }
         }
 
         /// <summary>

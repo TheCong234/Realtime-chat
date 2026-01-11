@@ -23,6 +23,8 @@ function* handleLogin(action: ReturnType<typeof loginRequest>) {
     yield put(loginSuccess());
     toast.success("Đăng nhập thành công");
   } catch (error) {
+    console.log("erôr loging", error);
+
     const message = getErrorMessage(error);
     yield put(loginFailure(message));
     toast.error(message);

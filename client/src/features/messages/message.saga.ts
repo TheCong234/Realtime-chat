@@ -1,6 +1,6 @@
 import { call, put, select, takeLatest } from "redux-saga/effects";
 import { messageService } from "./message.service";
-import { IMessage, ISendMessagePayload } from "./message.type";
+import { IMessage, ISendMessagePayload, IRecallMessagePayload } from "./message.type";
 import {
   fetchMessages,
   fetchMessagesFailed,
@@ -11,6 +11,9 @@ import {
   loadMoreMessages,
   loadMoreMessagesSuccess,
   loadMoreMessagesFailed,
+  recallMessage,
+  recallMessageSuccess,
+  recallMessageFailed,
 } from "./message.slice";
 import { PayloadAction } from "@reduxjs/toolkit";
 import { IBaseResponse, IMessagePagedResult } from "@/types/api-response";
@@ -53,7 +56,6 @@ function* loadMoreMessagesSaga(action: PayloadAction<string>) {
       nextPage,
       50,
     );
-    console.log(response);
 
     const hasMore = response.data.pageNumber * response.data.pageSize < response.data.totalCount;
     yield put(loadMoreMessagesSuccess({ messages: response.data.items, hasMore }));
@@ -63,8 +65,18 @@ function* loadMoreMessagesSaga(action: PayloadAction<string>) {
   }
 }
 
+function* recallMessageSaga(action: PayloadAction<IRecallMessagePayload>) {
+  try {
+    yield call(messageService.recallMessage, action.payload.messageId);
+    yield put(recallMessageSuccess(action.payload.messageId));
+  } catch (error) {
+    yield put(recallMessageFailed(getErrorMessage(error)));
+  }
+}
+
 export function* messageSaga() {
   yield takeLatest(fetchMessages.type, fetchMessagesSaga);
   yield takeLatest(sendMessage.type, sendMessageSaga);
   yield takeLatest(loadMoreMessages.type, loadMoreMessagesSaga);
+  yield takeLatest(recallMessage.type, recallMessageSaga);
 }

@@ -91,12 +91,83 @@ namespace CoongChat.Infrastructure.Repositories
             await _context.SaveChangesAsync(ct);
         }
 
+        public async Task<List<Guid>> MarkAllAsSeenAndGetSenderIdsAsync(Guid userId, Guid conversationId, CancellationToken ct = default)
+        {
+            var messageStatuses = await _context.MessageStates
+                .Include(ms => ms.Message)
+                .Where(ms => ms.UserId == userId 
+                    && ms.Message.ConversationId == conversationId 
+                    && ms.Status != MessageReadStatus.Seen
+                    && ms.Status != MessageReadStatus.Recalled)
+                .ToListAsync(ct);
+
+            // Get unique sender IDs of affected messages
+            var senderIds = messageStatuses
+                .Select(ms => ms.Message.SenderId)
+                .Distinct()
+                .ToList();
+
+            foreach (var status in messageStatuses)
+            {
+                status.Status = MessageReadStatus.Seen;
+                status.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync(ct);
+
+            return senderIds;
+        }
+
         public async Task<List<MessageStatus>> GetStatusesByMessageIdAsync(Guid messageId, CancellationToken ct = default)
         {
             return await _context.MessageStates
                 .AsNoTracking()
                 .Where(x => x.MessageId == messageId)
                 .ToListAsync(ct);
+        }
+
+        public async Task RecallMessageAsync(Guid messageId, CancellationToken ct = default)
+        {
+            var statuses = await _context.MessageStates
+                .Where(x => x.MessageId == messageId)
+                .ToListAsync(ct);
+
+            foreach (var status in statuses)
+            {
+                status.Status = MessageReadStatus.Recalled;
+                status.UpdatedAt = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync(ct);
+        }
+
+        public async Task<MessageReadStatus> GetAggregatedStatusAsync(Guid messageId, Guid? viewerUserId, Guid senderId, CancellationToken ct = default)
+        {
+            var statuses = await _context.MessageStates
+                .AsNoTracking()
+                .Where(x => x.MessageId == messageId)
+                .ToListAsync(ct);
+
+            if (!statuses.Any())
+            {
+                return MessageReadStatus.Sent;
+            }
+
+            // If any status is Recalled, return Recalled
+            if (statuses.Any(s => s.Status == MessageReadStatus.Recalled))
+            {
+                return MessageReadStatus.Recalled;
+            }
+
+            // If viewer is the sender, return the minimum status (worst case for all recipients)
+            if (viewerUserId == senderId || viewerUserId == null)
+            {
+                return statuses.Min(s => s.Status);
+            }
+
+            // If viewer is a recipient, return their own status
+            var viewerStatus = statuses.FirstOrDefault(s => s.UserId == viewerUserId);
+            return viewerStatus?.Status ?? MessageReadStatus.Sent;
         }
     }
 }

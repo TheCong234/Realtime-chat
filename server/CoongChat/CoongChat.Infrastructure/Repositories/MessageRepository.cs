@@ -49,5 +49,20 @@ namespace CoongChat.Infrastructure.Repositories
                 Items = items
             };
         }
+
+        public async Task<Message?> GetByIdAsync(Guid messageId, CancellationToken cancellationToken)
+        {
+            return await _context.Messages
+                .Include(m => m.Sender)
+                .Include(m => m.Conversation)
+                    .ThenInclude(c => c.Members)
+                .FirstOrDefaultAsync(m => m.Id == messageId, cancellationToken);
+        }
+
+        public async Task UpdateAsync(Message message, CancellationToken cancellationToken)
+        {
+            _context.Messages.Update(message);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }
