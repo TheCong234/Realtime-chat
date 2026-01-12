@@ -11,6 +11,7 @@ import {
   getOnlineUsers,
   getConnection,
   HubConnectionState,
+  acknowledgeMessageReceived,
 } from "@/lib/signalr";
 import { setUserStatus, setOnlineUsers } from "@/features/user/user.slice";
 import {
@@ -91,7 +92,7 @@ export function useSignalR() {
   // Handler for new event format: (conversation, message)
   // Using ref to avoid re-creating callback when conversation changes
   const handleReceiveMessage = useCallback(
-    (conversation: IConversation, message: IMessage) => {
+    async (conversation: IConversation, message: IMessage) => {
       console.log("SignalR: ReceiveMessage", { conversation, message });
 
       // Always update conversation list (move to top with new last message)
@@ -100,6 +101,13 @@ export function useSignalR() {
       // Only add message to messages state if user is viewing this conversation
       if (currentConversationIdRef.current === conversation.id) {
         dispatch(receiveMessage(message));
+      }
+
+      // Acknowledge receipt - triggers MessageDelivered event back to sender
+      try {
+        await acknowledgeMessageReceived(message.id);
+      } catch (error) {
+        console.error("Failed to acknowledge message:", error);
       }
     },
     [dispatch], // No currentConversationId dependency - using ref instead
@@ -234,6 +242,20 @@ export function useSignalR() {
       disconnect();
     };
   }, [accessToken, connect, disconnect]);
+
+  // Handle tab close/refresh - ensure SignalR disconnects
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Synchronously stop connection on tab close
+      stopConnection();
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
 
   // Return connection state checker
   const isConnected = useCallback(() => {

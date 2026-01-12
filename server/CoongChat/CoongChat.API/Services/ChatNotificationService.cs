@@ -28,49 +28,16 @@ namespace CoongChat.API.Services
 
         public async Task SendMessageToUsersAsync(List<Guid> userIds, ConversationDto conversation, MessageDto message, CancellationToken ct = default)
         {
-            // Get all connection IDs for the target users and track online users
-            var connectionIds = new List<string>();
-            var onlineUserIds = new List<Guid>();
-            
+            // Send message to all recipients who are online
+            // Client will call AcknowledgeMessageReceived after receiving
             foreach (var userId in userIds)
             {
                 var userConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(userId, ct);
                 if (userConnections.Count > 0)
                 {
-                    connectionIds.AddRange(userConnections);
-                    onlineUserIds.Add(userId);
-                }
-            }
-
-            if (connectionIds.Count > 0)
-            {
-                // Send message to online users
-                await _hubContext.Clients
-                    .Clients(connectionIds)
-                    .SendAsync("ReceiveMessage", conversation, message, ct);
-
-                // Mark message as Delivered for online recipients
-                foreach (var onlineUserId in onlineUserIds)
-                {
-                    await _messageStatusRepository.UpdateStatusAsync(
-                        message.Id,
-                        onlineUserId,
-                        MessageReadStatus.Delivered,
-                        ct);
-                }
-
-                // Notify sender about delivery status
-                var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(message.SenderId, ct);
-                if (senderConnections.Count > 0)
-                {
                     await _hubContext.Clients
-                        .Clients(senderConnections)
-                        .SendAsync("MessageDelivered", new
-                        {
-                            MessageId = message.Id,
-                            ConversationId = conversation.Id,
-                            Status = (int)MessageReadStatus.Delivered
-                        }, ct);
+                        .Clients(userConnections)
+                        .SendAsync("ReceiveMessage", conversation, message, ct);
                 }
             }
         }

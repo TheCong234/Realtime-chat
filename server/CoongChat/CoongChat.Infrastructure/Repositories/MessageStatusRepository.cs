@@ -28,6 +28,14 @@ namespace CoongChat.Infrastructure.Repositories
                 .FirstOrDefaultAsync(x => x.MessageId == messageId && x.UserId == userId, ct);
         }
 
+        public async Task<MessageStatus?> GetWithMessageAsync(Guid messageId, Guid userId, CancellationToken ct = default)
+        {
+            return await _context.MessageStates
+                .Include(x => x.Message)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.MessageId == messageId && x.UserId == userId, ct);
+        }
+
         public async Task UpdateStatusAsync(Guid messageId, Guid userId, MessageReadStatus newStatus, CancellationToken ct = default)
         {
             var status = await _context.MessageStates

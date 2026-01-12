@@ -179,10 +179,19 @@ namespace CoongChat.API
                 app.UseSwaggerUI();
             }
             using (var scope = app.Services.CreateScope())
-{
-    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-    db.Database.Migrate();
-}
+            {
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                db.Database.Migrate();
+                
+                // Cleanup stale connections from previous server runs
+                var staleConnections = db.UserConnections.Count();
+                if (staleConnections > 0)
+                {
+                    db.UserConnections.RemoveRange(db.UserConnections);
+                    db.SaveChanges();
+                    Console.WriteLine($"Cleaned up {staleConnections} stale UserConnections from database");
+                }
+            }
 
             app.UseStaticFiles(); // Serve uploaded files from wwwroot
             app.UseMiddleware<ExceptionHandlingMiddleware>();
