@@ -8,17 +8,13 @@ export const axiosClient = axios.create({
 axiosClient.interceptors.response.use(
   (response) => {
     const res = response.data;
-
-    if (!res.success) {
-      return Promise.reject({
-        message: res.message,
-      });
+    if (res && res.success === false) {
+      return Promise.reject(res);
     }
     return res;
   },
   (error) => {
-    return Promise.reject({
-      message: error.response?.data?.message || error.message || "Đã xảy ra lỗi hệ thống",
-    });
+    const serverError = error.response?.data;
+    return Promise.reject(serverError || error || "Đã xảy ra lỗi hệ thống");
   },
 );

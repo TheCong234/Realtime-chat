@@ -1,5 +1,6 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { AxiosError } from "axios";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -65,14 +66,25 @@ export const getUserInitials = ({ fullName, username }: IUserInitials) => {
 };
 
 //error
-import { AxiosError } from "axios";
 
-export const getErrorMessage = (error: unknown): string => {
-  if (error instanceof AxiosError) {
-    return error.response?.data?.message || error.message;
-  }
-  if (error instanceof Error) {
+export const getErrorMessage = (error: any): string => {
+  // 1. Nếu error là object và có field message trực tiếp (do Interceptor reject res)
+  if (error?.message && typeof error.message === "string") {
     return error.message;
   }
-  return "Đã có lỗi xảy ra";
+
+  // 2. Nếu error là object có field message là một object khác (trường hợp cũ của bạn)
+  if (error?.message?.message) {
+    return String(error.message.message);
+  }
+
+  // 3. Nếu là lỗi của Axios (chưa qua interceptor hoặc lỗi kết nối)
+  if (error?.response?.data?.message) {
+    return error.response.data.message;
+  }
+
+  // 4. Các lỗi mặc định
+  if (typeof error === "string") return error;
+
+  return error?.message || "Đã có lỗi xảy ra";
 };

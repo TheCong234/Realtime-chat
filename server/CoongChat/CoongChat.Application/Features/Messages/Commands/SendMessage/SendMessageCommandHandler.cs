@@ -12,17 +12,20 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IConversationRepository _conversationRepository;
+        private readonly IMessageStatusRepository _messageStatusRepository;
         private readonly IChatNotificationService _chatNotificationService;
         private readonly IMapper _mapper;
 
         public SendMessageCommandHandler(
             IMessageRepository messageRepository,
             IConversationRepository conversationRepository,
+            IMessageStatusRepository messageStatusRepository,
             IChatNotificationService chatNotificationService,
             IMapper mapper)
         {
             _messageRepository = messageRepository;
             _conversationRepository = conversationRepository;
+            _messageStatusRepository = messageStatusRepository;
             _chatNotificationService = chatNotificationService;
             _mapper = mapper;
         }
@@ -47,7 +50,7 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
 
             var message = new Message
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id ?? Guid.NewGuid(),  // Use client ID if provided, otherwise generate
                 ConversationId = conversation.Id,
                 SenderId = request.CurrentUserId,
                 Type = request.Type,
@@ -67,6 +70,9 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
                 .Where(m => m.UserId != request.CurrentUserId)
                 .Select(m => m.UserId)
                 .ToList();
+
+            // Create message status records for all recipients (status = Sent)
+            await _messageStatusRepository.CreateForRecipientsAsync(message.Id, memberUserIds, cancellationToken);
 
             await _chatNotificationService.SendMessageToUsersAsync(
                 memberUserIds,

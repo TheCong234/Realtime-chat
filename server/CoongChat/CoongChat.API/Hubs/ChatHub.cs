@@ -14,17 +14,20 @@ namespace CoongChat.API.Hubs
         private readonly IUserRepository _userRepository;
         private readonly IConversationRepository _conversationRepository;
         private readonly IMessageStatusRepository _messageStatusRepository;
+        private readonly ILogger<ChatHub> _logger;
 
         public ChatHub(
             IUserConnectionRepository userConnectionRepository,
             IUserRepository userRepository,
             IConversationRepository conversationRepository,
-            IMessageStatusRepository messageStatusRepository)
+            IMessageStatusRepository messageStatusRepository,
+            ILogger<ChatHub> logger)
         {
             _userConnectionRepository = userConnectionRepository;
             _userRepository = userRepository;
             _conversationRepository = conversationRepository;
             _messageStatusRepository = messageStatusRepository;
+            _logger = logger;
         }
 
         private Guid GetUserId()
@@ -58,6 +61,28 @@ namespace CoongChat.API.Hubs
                 Status = (int)UserStatus.Online
             });
 
+            // Mark all pending messages to this user as Delivered and notify senders
+            _logger.LogInformation("User {UserId} connected, marking messages as delivered...", userId);
+            var deliveredInfo = await _messageStatusRepository.MarkAllAsDeliveredForUserAndGetSendersAsync(userId);
+            _logger.LogInformation("Marked messages in {Count} conversations as delivered for user {UserId}", deliveredInfo.Count, userId);
+
+            foreach (var (conversationId, senderIds) in deliveredInfo)
+            {
+                foreach (var senderId in senderIds)
+                {
+                    var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(senderId);
+                    if (senderConnections.Count > 0)
+                    {
+                        await Clients.Clients(senderConnections).SendAsync("ConversationDelivered", new
+                        {
+                            ConversationId = conversationId,
+                            UserId = userId,
+                            Status = (int)MessageReadStatus.Delivered
+                        });
+                    }
+                }
+            }
+
             await base.OnConnectedAsync();
         }
 
@@ -66,11 +91,14 @@ namespace CoongChat.API.Hubs
             var userId = GetUserId();
             var connectionId = Context.ConnectionId;
 
+            _logger.LogInformation("User {UserId} disconnecting, connectionId: {ConnectionId}", userId, connectionId);
+
             // Remove connection record
             await _userConnectionRepository.RemoveByConnectionIdAsync(connectionId);
 
             // Check if user has other active connections
             var remainingConnections = await _userConnectionRepository.GetConnectionCountByUserIdAsync(userId);
+            _logger.LogInformation("User {UserId} has {Count} remaining connections", userId, remainingConnections);
 
             if (remainingConnections == 0)
             {
@@ -78,6 +106,7 @@ namespace CoongChat.API.Hubs
                 await _userRepository.UpdateStatusAsync(userId, UserStatus.Offline);
 
                 // Notify all clients about user status change
+                _logger.LogInformation("Notifying all clients that user {UserId} is now Offline", userId);
                 await Clients.Others.SendAsync("UserStatusChanged", new
                 {
                     UserId = userId,
@@ -135,21 +164,60 @@ namespace CoongChat.API.Hubs
         }
 
         /// <summary>
+        /// Called when client acknowledges receiving a message - updates status to Delivered and notifies sender
+        /// </summary>
+        public async Task AcknowledgeMessageReceived(Guid messageId)
+        {
+            var userId = GetUserId();
+
+            // Update status to Delivered
+            await _messageStatusRepository.UpdateStatusAsync(messageId, userId, MessageReadStatus.Delivered);
+
+            // Get message to find sender and conversation info
+            var messageStatus = await _messageStatusRepository.GetWithMessageAsync(messageId, userId);
+            if (messageStatus?.Message != null)
+            {
+                // Notify sender about the delivery
+                var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(messageStatus.Message.SenderId);
+                if (senderConnections.Count > 0)
+                {
+                    await Clients.Clients(senderConnections).SendAsync("MessageDelivered", new
+                    {
+                        MessageId = messageId,
+                        ConversationId = messageStatus.Message.ConversationId,
+                        Status = (int)MessageReadStatus.Delivered
+                    });
+                }
+            }
+        }
+
+        /// <summary>
         /// Mark all messages in a conversation as seen
         /// </summary>
         public async Task MarkConversationAsSeen(Guid conversationId)
         {
             var userId = GetUserId();
 
-            await _messageStatusRepository.MarkAllAsSeenAsync(userId, conversationId);
+            // Mark messages as seen and get sender IDs
+            var senderIds = await _messageStatusRepository.MarkAllAsSeenAndGetSenderIdsAsync(userId, conversationId);
 
-            // Notify all members in the conversation
-            await Clients.Group(conversationId.ToString()).SendAsync("ConversationSeen", new
+            if (senderIds.Count > 0)
             {
-                ConversationId = conversationId,
-                UserId = userId,
-                Status = (int)MessageReadStatus.Seen
-            });
+                // Notify each sender about the status change via their connections
+                foreach (var senderId in senderIds)
+                {
+                    var senderConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(senderId);
+                    if (senderConnections.Count > 0)
+                    {
+                        await Clients.Clients(senderConnections).SendAsync("ConversationSeen", new
+                        {
+                            ConversationId = conversationId,
+                            UserId = userId,
+                            Status = (int)MessageReadStatus.Seen
+                        });
+                    }
+                }
+            }
         }
 
         /// <summary>

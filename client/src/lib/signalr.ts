@@ -149,6 +149,20 @@ export async function markConversationAsSeen(conversationId: string): Promise<vo
 }
 
 /**
+ * Marks a specific message as delivered
+ */
+export async function markMessageDelivered(messageId: string): Promise<void> {
+  await invoke("MarkMessageDelivered", messageId);
+}
+
+/**
+ * Acknowledges that a message was received - triggers Delivered status update
+ */
+export async function acknowledgeMessageReceived(messageId: string): Promise<void> {
+  await invoke("AcknowledgeMessageReceived", messageId);
+}
+
+/**
  * Gets list of online user IDs
  */
 export async function getOnlineUsers(): Promise<string[]> {

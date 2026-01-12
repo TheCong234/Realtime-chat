@@ -18,6 +18,11 @@ namespace CoongChat.Application.Interfaces
         /// Notifies specific users about message status changes
         /// </summary>
         Task NotifyMessageStatusChangedAsync(List<Guid> userIds, Guid messageId, Guid userId, int status, CancellationToken ct = default);
+
+        /// <summary>
+        /// Notifies specific users that a message has been recalled
+        /// </summary>
+        Task NotifyMessageRecalledAsync(List<Guid> userIds, Guid conversationId, Guid messageId, CancellationToken ct = default);
     }
 }
 

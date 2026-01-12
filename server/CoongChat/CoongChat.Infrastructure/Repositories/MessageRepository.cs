@@ -25,6 +25,7 @@ namespace CoongChat.Infrastructure.Repositories
         {
             var query = _context.Messages
                 .Include(m => m.Sender)
+                .Include(m => m.Statuses)
                 .Where(m => m.ConversationId == conversationId)
                 .AsQueryable();
 
@@ -48,6 +49,21 @@ namespace CoongChat.Infrastructure.Repositories
                 TotalCount = totalCount,
                 Items = items
             };
+        }
+
+        public async Task<Message?> GetByIdAsync(Guid messageId, CancellationToken cancellationToken)
+        {
+            return await _context.Messages
+                .Include(m => m.Sender)
+                .Include(m => m.Conversation)
+                    .ThenInclude(c => c.Members)
+                .FirstOrDefaultAsync(m => m.Id == messageId, cancellationToken);
+        }
+
+        public async Task UpdateAsync(Message message, CancellationToken cancellationToken)
+        {
+            _context.Messages.Update(message);
+            await _context.SaveChangesAsync(cancellationToken);
         }
     }
 }

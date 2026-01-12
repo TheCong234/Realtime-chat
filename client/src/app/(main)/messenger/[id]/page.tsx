@@ -15,6 +15,7 @@ import { fetchMessages, loadMoreMessages } from "@/features/messages/message.sli
 import { fetchConversationDetails } from "@/features/conversations/conversation.slice";
 import { UserStatus } from "@/constants/enum";
 import { IMAGE_DOMAIN } from "@/environments";
+import { markConversationAsSeen, getConnection, HubConnectionState } from "@/lib/signalr";
 
 const ChatPage = () => {
   const params = useParams();
@@ -54,6 +55,28 @@ const ChatPage = () => {
     dispatch(fetchMessages(conversationId));
     dispatch(fetchConversationDetails(conversationId));
   }, [conversationId, dispatch]);
+
+  /** ================= MARK AS SEEN ================= */
+  useEffect(() => {
+    if (!conversationId || messages.length === 0) return;
+
+    // Mark all messages as seen when user views the conversation
+    const markAsSeen = async () => {
+      try {
+        const connection = getConnection();
+        if (connection && connection.state === HubConnectionState.Connected) {
+          await markConversationAsSeen(conversationId);
+          console.log("Marked conversation as seen:", conversationId);
+        }
+      } catch (error) {
+        console.error("Failed to mark conversation as seen:", error);
+      }
+    };
+
+    // Small delay to ensure connection is ready
+    const timer = setTimeout(markAsSeen, 500);
+    return () => clearTimeout(timer);
+  }, [conversationId]); // Only run when conversationId changes
 
   /** ================= INITIAL SCROLL ================= */
   useEffect(() => {

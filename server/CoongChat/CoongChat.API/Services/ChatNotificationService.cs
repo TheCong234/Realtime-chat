@@ -2,6 +2,7 @@ using CoongChat.API.Hubs;
 using CoongChat.Application.Features.Conversations.Dto;
 using CoongChat.Application.Features.Messages.Dto;
 using CoongChat.Application.Interfaces;
+using CoongChat.Domain.Common;
 using Microsoft.AspNetCore.SignalR;
 
 namespace CoongChat.API.Services
@@ -13,30 +14,31 @@ namespace CoongChat.API.Services
     {
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IUserConnectionRepository _userConnectionRepository;
+        private readonly IMessageStatusRepository _messageStatusRepository;
 
         public ChatNotificationService(
             IHubContext<ChatHub> hubContext,
-            IUserConnectionRepository userConnectionRepository)
+            IUserConnectionRepository userConnectionRepository,
+            IMessageStatusRepository messageStatusRepository)
         {
             _hubContext = hubContext;
             _userConnectionRepository = userConnectionRepository;
+            _messageStatusRepository = messageStatusRepository;
         }
 
         public async Task SendMessageToUsersAsync(List<Guid> userIds, ConversationDto conversation, MessageDto message, CancellationToken ct = default)
         {
-            // Get all connection IDs for the target users
-            var connectionIds = new List<string>();
+            // Send message to all recipients who are online
+            // Client will call AcknowledgeMessageReceived after receiving
             foreach (var userId in userIds)
             {
                 var userConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(userId, ct);
-                connectionIds.AddRange(userConnections);
-            }
-
-            if (connectionIds.Count > 0)
-            {
-                await _hubContext.Clients
-                    .Clients(connectionIds)
-                    .SendAsync("ReceiveMessage", conversation, message, ct);
+                if (userConnections.Count > 0)
+                {
+                    await _hubContext.Clients
+                        .Clients(userConnections)
+                        .SendAsync("ReceiveMessage", conversation, message, ct);
+                }
             }
         }
 
@@ -59,6 +61,27 @@ namespace CoongChat.API.Services
                         MessageId = messageId,
                         UserId = userId,
                         Status = status
+                    }, ct);
+            }
+        }
+
+        public async Task NotifyMessageRecalledAsync(List<Guid> userIds, Guid conversationId, Guid messageId, CancellationToken ct = default)
+        {
+            var connectionIds = new List<string>();
+            foreach (var userId in userIds)
+            {
+                var userConnections = await _userConnectionRepository.GetConnectionIdsByUserIdAsync(userId, ct);
+                connectionIds.AddRange(userConnections);
+            }
+
+            if (connectionIds.Count > 0)
+            {
+                await _hubContext.Clients
+                    .Clients(connectionIds)
+                    .SendAsync("MessageRecalled", new
+                    {
+                        ConversationId = conversationId,
+                        MessageId = messageId
                     }, ct);
             }
         }

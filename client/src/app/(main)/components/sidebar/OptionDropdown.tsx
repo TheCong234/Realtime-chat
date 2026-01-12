@@ -9,6 +9,7 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu";
 import { logout } from "@/features/auth/auth.slice";
+import { stopConnection } from "@/lib/signalr";
 import {
   ArchiveIcon,
   LockKeyholeIcon,
@@ -43,7 +44,9 @@ const DropdownMenuItemCustom = ({
 export function OptionDropdown() {
   const dispatch = useDispatch();
   const router = useRouter();
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // Disconnect SignalR before logout
+    await stopConnection();
     dispatch(logout());
     toast.success("Đăng xuất thành công");
     router.replace("/login");

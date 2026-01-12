@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using CoongChat.Application.Features.Messages.Commands.RecallMessage;
 using CoongChat.Application.Features.Messages.Commands.SendMessage;
 using CoongChat.Application.Features.Messages.Commands.SendMessageToMultipleUsers;
 using CoongChat.Application.Features.Messages.Queries;
@@ -73,6 +74,29 @@ namespace CoongChat.API.Controllers
             query.ConversationId = id;
             query.CurrentUserId = Guid.Parse(userIdClaim);
             var result = await _mediator.Send(query);
+            return Ok(result);
+        }
+
+        [HttpPost("{id}/Recall")]
+        public async Task<IActionResult> RecallMessage(Guid id)
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(userIdClaim))
+            {
+                return Unauthorized();
+            }
+
+            var command = new RecallMessageCommand
+            {
+                MessageId = id,
+                CurrentUserId = Guid.Parse(userIdClaim)
+            };
+            var result = await _mediator.Send(command);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
             return Ok(result);
         }
     }
