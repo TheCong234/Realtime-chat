@@ -59,7 +59,10 @@ const messageSlice = createSlice({
       // Update the optimistic message with real data from server
       const index = state.messages.findIndex((m) => m.id === action.payload.id);
       if (index !== -1) {
-        state.messages[index] = action.payload;
+        state.messages[index] = {
+          ...action.payload,
+          status: state.messages[index].status,
+        };
       } else {
         state.messages.push(action.payload);
       }
@@ -94,8 +97,16 @@ const messageSlice = createSlice({
         state.messages.push(action.payload);
       }
     },
-    updateMessageStatus(state, action: PayloadAction<{ messageId: string; status: MessageReadStatus }>) {
+    updateMessageStatus(
+      state,
+      action: PayloadAction<{ messageId: string; conversationId: string; status: MessageReadStatus }>,
+    ) {
+      if (state.messages.length === 0) return;
+      if (action.payload.conversationId !== state.messages[0].conversationId) return;
+
       const message = state.messages.find((m) => m.id === action.payload.messageId);
+      console.log("Found message:", message ? message.status : "NOT FOUND");
+
       if (message) {
         message.status = action.payload.status;
       }

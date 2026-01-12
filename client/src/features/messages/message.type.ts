@@ -29,6 +29,7 @@ export interface IMessage {
 }
 
 export interface ISendMessagePayload {
+  id: string; // Client-generated UUID for optimistic updates
   conversationId: string;
   type: number;
   content: string;

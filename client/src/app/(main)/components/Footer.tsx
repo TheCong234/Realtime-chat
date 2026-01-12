@@ -27,6 +27,7 @@ const Footer = ({ onSendMessage }: IFooterProps) => {
         // Otherwise use the conversation mode (existing behavior)
         dispatch(
           sendMessage({
+            id: crypto.randomUUID(), // Client-generated ID for optimistic updates
             conversationId,
             type: 0, // Text message
             content: content.trim(),

@@ -32,6 +32,7 @@ interface IUserStatusChangedEvent {
 
 interface IMessageStatusChangedEvent {
   messageId: string;
+  conversationId: string;
   userId: string;
   status: MessageReadStatus;
 }
@@ -50,6 +51,12 @@ interface IMessageRecalledEvent {
 interface IConversationDeliveredEvent {
   conversationId: string;
   userId: string;
+  status: MessageReadStatus;
+}
+
+interface IMessageDeliveredEvent {
+  messageId: string;
+  conversationId: string;
   status: MessageReadStatus;
 }
 
@@ -101,7 +108,9 @@ export function useSignalR() {
   const handleMessageStatusChanged = useCallback(
     (data: IMessageStatusChangedEvent) => {
       console.log("SignalR: MessageStatusChanged", data);
-      dispatch(updateMessageStatus({ messageId: data.messageId, status: data.status }));
+      dispatch(
+        updateMessageStatus({ messageId: data.messageId, conversationId: data.conversationId, status: data.status }),
+      );
     },
     [dispatch],
   );
@@ -131,6 +140,16 @@ export function useSignalR() {
     [dispatch],
   );
 
+  const handleMessageDelivered = useCallback(
+    (data: IMessageDeliveredEvent) => {
+      console.log("SignalR: MessageDelivered", data);
+      dispatch(
+        updateMessageStatus({ messageId: data.messageId, conversationId: data.conversationId, status: data.status }),
+      );
+    },
+    [dispatch],
+  );
+
   const connect = useCallback(async () => {
     if (!accessToken || isConnectedRef.current) return;
 
@@ -156,6 +175,7 @@ export function useSignalR() {
       on("MessageStatusChanged", handleMessageStatusChanged);
       on("ConversationSeen", handleConversationSeen);
       on("ConversationDelivered", handleConversationDelivered);
+      on("MessageDelivered", handleMessageDelivered);
       on("MessageRecalled", handleMessageRecalled);
 
       // Fetch initial online users
@@ -184,6 +204,7 @@ export function useSignalR() {
     handleMessageStatusChanged,
     handleConversationSeen,
     handleConversationDelivered,
+    handleMessageDelivered,
     handleMessageRecalled,
   ]);
 
@@ -196,6 +217,7 @@ export function useSignalR() {
     off("MessageStatusChanged");
     off("ConversationSeen");
     off("ConversationDelivered");
+    off("MessageDelivered");
     off("MessageRecalled");
 
     await stopConnection();

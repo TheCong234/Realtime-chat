@@ -50,7 +50,7 @@ namespace CoongChat.Application.Features.Messages.Commands.SendMessage
 
             var message = new Message
             {
-                Id = Guid.NewGuid(),
+                Id = request.Id ?? Guid.NewGuid(),  // Use client ID if provided, otherwise generate
                 ConversationId = conversation.Id,
                 SenderId = request.CurrentUserId,
                 Type = request.Type,

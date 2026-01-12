@@ -65,10 +65,10 @@ namespace CoongChat.API.Services
                 {
                     await _hubContext.Clients
                         .Clients(senderConnections)
-                        .SendAsync("ConversationDelivered", new
+                        .SendAsync("MessageDelivered", new
                         {
+                            MessageId = message.Id,
                             ConversationId = conversation.Id,
-                            UserId = onlineUserIds.First(), // Any online user
                             Status = (int)MessageReadStatus.Delivered
                         }, ct);
                 }
