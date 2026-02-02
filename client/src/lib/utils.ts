@@ -1,6 +1,5 @@
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { AxiosError } from "axios";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -67,6 +66,7 @@ export const getUserInitials = ({ fullName, username }: IUserInitials) => {
 
 //error
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getErrorMessage = (error: any): string => {
   // 1. Nếu error là object và có field message trực tiếp (do Interceptor reject res)
   if (error?.message && typeof error.message === "string") {
